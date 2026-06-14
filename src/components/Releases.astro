@@ -1,0 +1,79 @@
+---
+/**
+ * LATEST RELEASES
+ * Auto-generated grid. Each card = one folder in content/releases/.
+ * Add a release by adding a folder — no code changes. See README.
+ */
+import { Image } from 'astro:assets';
+import { getReleases } from '../lib/content';
+
+const releases = getReleases();
+
+const dateFmt = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+});
+function formatDate(iso: string): string {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? '' : dateFmt.format(d);
+}
+---
+
+<section id="releases" class="bg-ink py-24 md:py-32">
+  <div class="container-x">
+    <p class="eyebrow">01 — Music</p>
+    <h2 class="mt-3 text-5xl md:text-7xl">Latest Releases</h2>
+
+    {releases.length === 0 ? (
+      <p class="mt-10 text-paper/50">
+        No releases yet. Add a folder under <code>content/releases/</code>.
+      </p>
+    ) : (
+      <div class="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {releases.map((r) => (
+          <article class="group flex flex-col">
+            {r.cover && (
+              <div class="relative aspect-square overflow-hidden bg-paper/5">
+                <Image
+                  src={r.cover}
+                  alt={`${r.title} cover art`}
+                  class="h-full w-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-105"
+                  widths={[320, 480, 640]}
+                  sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
+                  loading="lazy"
+                />
+              </div>
+            )}
+
+            <div class="mt-5 flex items-baseline justify-between gap-4">
+              <h3 class="font-display text-xl uppercase tracking-tight">{r.title}</h3>
+              <time class="shrink-0 font-sans text-xs uppercase tracking-widest text-paper/40">
+                {formatDate(r.releaseDate)}
+              </time>
+            </div>
+
+            {r.description && (
+              <p class="mt-2 text-sm leading-relaxed text-paper/60">{r.description}</p>
+            )}
+
+            {r.spotifyEmbedUrl && (
+              <div class="mt-4">
+                <iframe
+                  src={r.spotifyEmbedUrl}
+                  width="100%"
+                  height="80"
+                  frameborder="0"
+                  loading="lazy"
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  title={`${r.title} — Spotify player`}
+                  class="rounded-lg"
+                ></iframe>
+              </div>
+            )}
+          </article>
+        ))}
+      </div>
+    )}
+  </div>
+</section>

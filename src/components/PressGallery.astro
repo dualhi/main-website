@@ -1,0 +1,52 @@
+---
+/**
+ * PRESS / VISUAL GALLERY
+ * Responsive masonry layout. Auto-reads every image in content/press/.
+ * Add photos by dropping files into that folder — no code changes.
+ *
+ * On scroll, each photo gets a subtle parallax (GSAP, see
+ * ../scripts/parallax.ts): photos lower in a column drift upward slightly
+ * faster, so they gently overlap the ones above — a delicate, dynamic feel
+ * inspired by martingarrix.com. The layout, image files, names and sizes are
+ * unchanged; only the scroll movement is added.
+ */
+import { Image } from 'astro:assets';
+import { getPressImages } from '../lib/content';
+
+const images = getPressImages();
+---
+
+<section id="press" class="border-t border-paper/10 bg-ink py-24 md:py-32">
+  <div class="container-x">
+    <p class="eyebrow">04 — Press</p>
+    <h2 class="mt-3 text-5xl md:text-7xl">Visuals</h2>
+
+    {images.length === 0 ? (
+      <p class="mt-10 text-paper/50">
+        No press photos yet. Drop images into <code>content/press/</code>.
+      </p>
+    ) : (
+      <!-- CSS columns give a simple, robust masonry layout. -->
+      <div class="press-grid mt-12 [column-fill:_balance] gap-4 sm:columns-2 lg:columns-3">
+        {images.map((img) => (
+          <div class="press-item relative mb-4 break-inside-avoid overflow-hidden bg-paper/5 will-change-transform">
+            <Image
+              src={img.src}
+              alt={`Dualhï press — ${img.name}`}
+              class="w-full"
+              widths={[400, 640, 900]}
+              sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
+              loading="lazy"
+            />
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</section>
+
+<!-- Subtle scroll parallax for the gallery (GSAP + ScrollTrigger). -->
+<script>
+  import { initPressParallax } from '../scripts/parallax';
+  initPressParallax();
+</script>

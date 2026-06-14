@@ -1,0 +1,116 @@
+---
+/**
+ * TIKTOK CAROUSEL
+ * Auto-scrolling horizontal band of TikTok videos using TikTok's official
+ * embed (blockquote + embed.js) — reliable everywhere. The seamless loop uses a
+ * single set of cards (no duplication). Background = repeating Dualhï logo
+ * pattern fading into black.
+ * Edit the list in content/tiktok/videos.json. See ../scripts/tiktok.ts.
+ */
+import TikTokCard from './TikTokCard.astro';
+import { getTikToks } from '../lib/content';
+import { SOCIALS } from '../lib/site';
+
+const videos = getTikToks();
+const profileUrl = SOCIALS.find((s) => s.name === 'TikTok')?.url ?? 'https://www.tiktok.com/@wearedualhi';
+---
+
+<section id="tiktok" class="relative overflow-hidden border-t border-paper/10 bg-ink pt-24 pb-28 md:pt-32 md:pb-36">
+  <!-- Background: repeating logo pattern, faded into the black via a mask.
+       NOTE: the <symbol> path data mirrors src/assets/logo/logo-vector.svg —
+       if that file changes, update these two paths too. -->
+  <div class="pattern-mask pointer-events-none absolute inset-0 select-none">
+    <svg class="h-full w-full text-paper" aria-hidden="true">
+      <defs>
+        <symbol id="dualhi-mark" viewBox="0 0 2734 2336">
+          <path
+            d="M2671.48 2277.77C2696.91 2302.75 2717.7 2294.02 2717.7 2258.39V80.8857C2717.7 45.2463 2688.54 16.0869 2652.9 16.0869H1013.75C978.106 16.0869 948.945 45.2463 948.945 80.8857V520.378C948.945 556.017 969.753 605.617 995.169 630.601L2671.48 2277.77Z"
+            fill="currentColor"
+          />
+          <path
+            d="M62.4222 37.7783C36.9952 12.7949 16.2002 21.5171 16.2002 57.1565V2255C16.2002 2290.64 45.3611 2319.8 81.0023 2319.8H1735.75C1771.39 2319.8 1800.55 2290.64 1800.55 2255V1810.5C1800.55 1774.86 1779.75 1725.26 1754.32 1700.27L62.4222 37.7783Z"
+            fill="currentColor"
+          />
+        </symbol>
+        <!-- Two staggered marks per tile (one higher than the other). -->
+        <pattern id="dualhi-tile" width="170" height="150" patternUnits="userSpaceOnUse">
+          <use href="#dualhi-mark" x="0" y="14" width="64" height="55" />
+          <use href="#dualhi-mark" x="92" y="78" width="64" height="55" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#dualhi-tile)" />
+    </svg>
+  </div>
+
+  <div class="relative">
+    <div class="container-x">
+      <p class="eyebrow">03 — TikTok</p>
+      <h2 class="mt-3 text-5xl md:text-7xl">On TikTok</h2>
+      <p class="mt-4 max-w-xl text-sm text-paper/50">
+        A live look at what we're doing on TikTok. Hover to slow the reel down,
+        press play on any video to watch.
+      </p>
+    </div>
+
+    <!-- Carousel: the viewport clips on desktop (GSAP marquee) and becomes a
+         native swipe strip on mobile / reduced-motion. -->
+    <div class="tiktok-viewport mt-12 w-full">
+      <div class="tiktok-track flex w-max gap-4 px-6 md:px-10">
+        {videos.map((v, i) => (
+          <TikTokCard video={v} index={i} profileUrl={profileUrl} />
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* The logo band: invisible at the very top, faint through the middle, a touch
+     more visible toward the bottom, then softly fading out (so the last row is
+     not hard-cut, and it never reaches solid white). Horizontal gradient keeps
+     the left/right edges fading into the black.
+     (Mask alpha drives the logo opacity, since the <rect> is fully opaque.) */
+  .pattern-mask {
+    --band-v: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.09) 16%,
+      rgba(0, 0, 0, 0.09) 58%,
+      rgba(0, 0, 0, 0.2) 84%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    --band-h: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    -webkit-mask-image: var(--band-v), var(--band-h);
+    mask-image: var(--band-v), var(--band-h);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+
+  /* Mobile / reduced-motion: native horizontal swipe. */
+  .tiktok-viewport {
+    overflow-x: auto;
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+  }
+  .tiktok-viewport::-webkit-scrollbar {
+    display: none;
+  }
+  .tiktok-card {
+    scroll-snap-align: center;
+  }
+
+  /* Desktop marquee mode: clip and let GSAP drive the loop. */
+  #tiktok.is-marquee .tiktok-viewport {
+    overflow: hidden;
+    scroll-snap-type: none;
+  }
+</style>
+
+<!-- Seamless marquee + hover-slow (GSAP). -->
+<script>
+  import { initTikTok } from '../scripts/tiktok';
+  initTikTok();
+</script>
+
+<!-- Official TikTok embed script: turns the blockquotes into sized players. -->
+<script is:inline async src="https://www.tiktok.com/embed.js"></script>

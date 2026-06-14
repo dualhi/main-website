@@ -1,0 +1,27 @@
+---
+/**
+ * Dualhï — one-page press kit.
+ * Sections are composed here; edit content in the individual components,
+ * in src/lib/site.ts, or in the /content folder.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import Releases from '../components/Releases.astro';
+import Bio from '../components/Bio.astro';
+import TikTok from '../components/TikTok.astro';
+import PressGallery from '../components/PressGallery.astro';
+import Links from '../components/Links.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout>
+  <main>
+    <Hero />
+    <Releases />
+    <Bio />
+    <TikTok />
+    <PressGallery />
+    <Links />
+  </main>
+  <Footer />
+</BaseLayout>

@@ -1,0 +1,43 @@
+---
+/**
+ * LINKS / CONTACT
+ * Booking email front-and-centre, then a grid of social/platform buttons.
+ * All values come from src/lib/site.ts.
+ */
+import { CONTACT, SOCIALS } from '../lib/site';
+---
+
+<section id="contact" class="border-t border-paper/10 bg-ink py-24 md:py-32">
+  <div class="container-x">
+    <p class="eyebrow">05 — Contact</p>
+    <h2 class="mt-3 text-5xl md:text-7xl">Get in touch</h2>
+
+    <!-- Booking / management email -->
+    <div class="mt-12">
+      <span class="font-sans text-xs uppercase tracking-[0.3em] text-paper/50">
+        {CONTACT.label}
+      </span>
+      <a
+        href={`mailto:${CONTACT.email}`}
+        class="mt-3 block w-fit font-display text-3xl uppercase tracking-tight transition-colors hover:text-paper/60 md:text-5xl"
+      >
+        {CONTACT.email}
+      </a>
+    </div>
+
+    <!-- Social / platform links -->
+    <div class="mt-14 grid grid-cols-1 gap-px border border-paper/15 bg-paper/15 sm:grid-cols-2 lg:grid-cols-3">
+      {SOCIALS.map((s) => (
+        <a
+          href={s.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group flex items-center justify-between bg-ink px-6 py-6 transition-colors hover:bg-paper hover:text-ink"
+        >
+          <span class="font-display text-lg uppercase tracking-tight">{s.name}</span>
+          <span class="font-sans text-sm text-paper/40 transition-colors group-hover:text-ink" aria-hidden="true">↗</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>

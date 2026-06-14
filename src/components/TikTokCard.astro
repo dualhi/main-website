@@ -1,0 +1,59 @@
+---
+/**
+ * A single TikTok card.
+ * - Real video → TikTok's official embed (blockquote + embed.js, loaded once in
+ *   TikTok.astro). embed.js turns the blockquote into a correctly-sized player
+ *   iframe — reliable everywhere (no Access Denied). It shows the full official
+ *   card (author, video, caption).
+ * - Placeholder (unrecognized URL) → links to the TikTok profile instead.
+ */
+import logoVector from '../assets/logo/logo-vector.svg?raw';
+import type { TikTokVideo } from '../lib/content';
+
+interface Props {
+  video: TikTokVideo;
+  index: number;
+  profileUrl: string;
+}
+const { video, index, profileUrl } = Astro.props;
+const isReal = !!video.id;
+---
+
+{isReal ? (
+  <div class="tiktok-card group w-[325px] shrink-0 transition-transform duration-300 ease-out-expo hover:scale-[1.03]">
+    <blockquote
+      class="tiktok-embed !m-0"
+      cite={video.url}
+      data-video-id={video.id}
+      style="max-width:325px; min-width:300px;"
+    >
+      <section>
+        <a href={video.url} target="_blank" rel="noopener noreferrer">
+          Dualhï on TikTok — reel {index + 1}
+        </a>
+      </section>
+    </blockquote>
+  </div>
+) : (
+  <a
+    href={profileUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="tiktok-card group relative flex aspect-[9/16] w-[64vw] max-w-[230px] shrink-0 flex-col items-center justify-center overflow-hidden rounded-xl bg-paper/[0.04] ring-1 ring-paper/10 transition-transform duration-300 ease-out-expo hover:scale-[1.04] sm:w-[230px]"
+  >
+    <div class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.08]">
+      <div class="w-1/2 text-paper"><Fragment set:html={logoVector} /></div>
+    </div>
+    <span class="relative z-10 font-sans text-xs uppercase tracking-[0.2em] text-paper/60 transition-colors group-hover:text-paper">
+      View on TikTok ↗
+    </span>
+  </a>
+)}
+
+<style>
+  .tiktok-card :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+</style>

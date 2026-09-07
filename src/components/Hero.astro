@@ -53,11 +53,13 @@ import wordmark from '../assets/logo/wordmark.svg?raw';
 
     <!-- The two shards, centered and overlapping (diamond). -->
     <div class="hero-scaglie absolute inset-0 flex items-center justify-center">
-      <div class="scaglia scaglia-1 -mr-4 w-[36vw] max-w-[260px] text-paper md:w-[22vw]">
-        <Fragment set:html={scaglia1} />
-      </div>
-      <div class="scaglia scaglia-2 scaglia--outline -ml-4 w-[36vw] max-w-[260px] text-paper md:w-[22vw]">
-        <Fragment set:html={scaglia2} />
+      <div class="relative aspect-[2734/2336] w-[55vw] max-w-[400px] text-paper md:w-[34vw]">
+        <div class="scaglia scaglia-1 absolute left-[0.593%] top-[1.617%] w-[65.265%]">
+          <Fragment set:html={scaglia1} />
+        </div>
+        <div class="scaglia scaglia-2 scaglia--outline absolute left-[34.709%] top-[0.689%] w-[64.695%]">
+          <Fragment set:html={scaglia2} />
+        </div>
       </div>
     </div>
 

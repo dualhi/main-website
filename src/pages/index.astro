@@ -5,6 +5,7 @@
  * in src/lib/site.ts, or in the /content folder.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Menu from '../components/Menu.astro';
 import Hero from '../components/Hero.astro';
 import Releases from '../components/Releases.astro';
 import Bio from '../components/Bio.astro';
@@ -15,6 +16,7 @@ import Footer from '../components/Footer.astro';
 ---
 
 <BaseLayout>
+  <Menu />
   <main>
     <Hero />
     <Releases />

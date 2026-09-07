@@ -2,7 +2,8 @@
 /**
  * LATEST RELEASES
  * Auto-generated grid. Each card = one folder in content/releases/.
- * Add a release by adding a folder — no code changes. See README.
+ * Hovering a cover reveals the Dualhï shards + a play button; clicking it
+ * opens a popup with the artwork, a Spotify preview and streaming links.
  */
 import { Image } from 'astro:assets';
 import { getReleases } from '../lib/content';
@@ -17,6 +18,23 @@ const dateFmt = new Intl.DateTimeFormat('en-US', {
 function formatDate(iso: string): string {
   const d = new Date(iso);
   return Number.isNaN(d.getTime()) ? '' : dateFmt.format(d);
+}
+
+/** Public Spotify page for the release. */
+function toOpenUrl(embedUrl: string): string {
+  const m = embedUrl?.match(
+    /embed\/(track|album|playlist|episode|show)\/([A-Za-z0-9]+)/i,
+  );
+  return m ? `https://open.spotify.com/${m[1].toLowerCase()}/${m[2]}` : '';
+}
+
+/** Spotify first, then whatever extra links the release declares. */
+function linksFor(r: { spotifyEmbedUrl: string; links?: Record<string, string> }) {
+  const out: Record<string, string> = {};
+  const sp = toOpenUrl(r.spotifyEmbedUrl);
+  if (sp) out.Spotify = sp;
+  for (const [k, v] of Object.entries(r.links ?? {})) if (v) out[k] = v;
+  return out;
 }
 ---
 
@@ -33,18 +51,59 @@ function formatDate(iso: string): string {
       <div class="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {releases.map((r) => (
           <article class="group flex flex-col">
-            {r.cover && (
-              <div class="relative aspect-square overflow-hidden bg-paper/5">
-                <Image
-                  src={r.cover}
-                  alt={`${r.title} cover art`}
-                  class="h-full w-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-105"
-                  widths={[320, 480, 640]}
-                  sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
-                  loading="lazy"
-                />
-              </div>
-            )}
+            <div class="relative aspect-square overflow-hidden bg-paper/5">
+              {r.cover && (
+                <button
+                  type="button"
+                  data-open
+                  data-title={r.title}
+                  data-embed={r.spotifyEmbedUrl}
+                  data-links={JSON.stringify(linksFor(r))}
+                  aria-label={`${r.title} — listen`}
+                  class="absolute inset-0 block h-full w-full cursor-pointer"
+                >
+                  <Image
+                    src={r.cover}
+                    alt={`${r.title} cover art`}
+                    class="h-full w-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-105"
+                    widths={[320, 480, 640]}
+                    sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
+                    loading="lazy"
+                  />
+
+                  <span class="pointer-events-none absolute inset-0 bg-ink/25 opacity-0 transition-opacity duration-500 group-hover:opacity-100"></span>
+
+                  <span class="pointer-events-none absolute left-5 top-5 flex gap-2 text-paper">
+                    <svg
+                      viewBox="0 0 1785 2297"
+                      aria-hidden="true"
+                      class="h-6 w-auto -translate-y-2 opacity-0 transition duration-500 group-hover:translate-y-0 group-hover:opacity-90"
+                    >
+                      <path
+                        fill="currentColor"
+                        d="M46.222 14.2553C20.795 -10.7279 0 -2.00596 0 33.6334V2231.48C0 2267.12 29.1609 2296.28 64.8021 2296.28H1719.55C1755.19 2296.28 1784.35 2267.12 1784.35 2231.48V1786.97C1784.35 1751.34 1763.55 1701.74 1738.12 1676.75L46.222 14.2553Z"
+                      />
+                    </svg>
+                    <svg
+                      viewBox="0 0 1769 2276"
+                      aria-hidden="true"
+                      class="h-6 w-auto -translate-y-2 opacity-0 transition delay-100 duration-500 group-hover:translate-y-0 group-hover:opacity-60"
+                    >
+                      <path
+                        fill="currentColor"
+                        d="M1722.53 2261.68C1747.96 2286.67 1768.76 2277.93 1768.76 2242.31V64.7989C1768.76 29.1595 1739.6 0 1703.95 0H64.8021C29.1609 0 0 29.1595 0 64.7989V504.291C0 539.93 20.8079 589.53 46.2233 614.514L1722.53 2261.68Z"
+                      />
+                    </svg>
+                  </span>
+
+                  <span class="pointer-events-none absolute bottom-5 left-5 flex h-14 w-14 items-center justify-center rounded-full border border-paper/80 bg-ink/30 opacity-0 backdrop-blur-sm transition duration-500 group-hover:scale-110 group-hover:opacity-100">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="ml-0.5 h-5 w-5 text-paper">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </span>
+                </button>
+              )}
+            </div>
 
             <div class="mt-5 flex items-baseline justify-between gap-4">
               <h3 class="font-display text-xl uppercase tracking-tight">{r.title}</h3>
@@ -52,28 +111,102 @@ function formatDate(iso: string): string {
                 {formatDate(r.releaseDate)}
               </time>
             </div>
-
-            {r.description && (
-              <p class="mt-2 text-sm leading-relaxed text-paper/60">{r.description}</p>
-            )}
-
-            {r.spotifyEmbedUrl && (
-              <div class="mt-4">
-                <iframe
-                  src={r.spotifyEmbedUrl}
-                  width="100%"
-                  height="80"
-                  frameborder="0"
-                  loading="lazy"
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                  title={`${r.title} — Spotify player`}
-                  class="rounded-lg"
-                ></iframe>
-              </div>
-            )}
           </article>
         ))}
       </div>
     )}
   </div>
 </section>
+
+<div
+  data-modal
+  role="dialog"
+  aria-modal="true"
+  aria-label="Release"
+  class="fixed inset-0 z-50 hidden items-center justify-center bg-ink/90 p-5 backdrop-blur-sm"
+>
+  <div class="relative w-full max-w-sm border border-paper/15 bg-ink" data-modal-panel>
+    <button
+      type="button"
+      data-modal-close
+      aria-label="Close"
+      class="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-ink/60 text-paper backdrop-blur-sm transition hover:bg-paper hover:text-ink"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="h-4 w-4">
+        <path d="M18 6 6 18M6 6l12 12" />
+      </svg>
+    </button>
+
+    <img data-modal-cover alt="" class="aspect-square w-full object-cover" />
+
+    <div class="p-6">
+      <h3 data-modal-title class="font-display text-2xl uppercase tracking-tight"></h3>
+      <p class="mt-1 font-sans text-xs uppercase tracking-[0.3em] text-paper/40">Dualhï</p>
+
+      <div data-modal-player class="mt-5"></div>
+
+      <p class="mt-7 text-center font-sans text-[0.65rem] uppercase tracking-[0.3em] text-paper/40">
+        Listen on
+      </p>
+      <div data-modal-links class="mt-3 grid grid-cols-2 gap-px bg-paper/15"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const modal = document.querySelector('[data-modal]');
+  const panel = modal?.querySelector('[data-modal-panel]');
+  const cover = modal?.querySelector('[data-modal-cover]') as HTMLImageElement | null;
+  const title = modal?.querySelector('[data-modal-title]');
+  const playerBox = modal?.querySelector('[data-modal-player]');
+  const linksBox = modal?.querySelector('[data-modal-links]');
+
+  function close() {
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    if (playerBox) playerBox.innerHTML = ''; // stops the audio
+    document.body.style.overflow = '';
+  }
+
+  function open(btn: HTMLElement) {
+    if (!modal || !cover || !title || !playerBox || !linksBox) return;
+
+    const img = btn.querySelector('img');
+    cover.src = (img && (img.currentSrc || img.src)) || '';
+    cover.alt = btn.getAttribute('data-title') || '';
+    title.textContent = btn.getAttribute('data-title') || '';
+
+    const embed = btn.getAttribute('data-embed') || '';
+    playerBox.innerHTML = embed
+      ? `<iframe src="${embed}" width="100%" height="80" frameborder="0" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" class="rounded-lg" title="Spotify preview"></iframe>`
+      : '';
+
+    let links: Record<string, string> = {};
+    try {
+      links = JSON.parse(btn.getAttribute('data-links') || '{}');
+    } catch {}
+    linksBox.innerHTML = Object.entries(links)
+      .map(
+        ([name, url]) =>
+          `<a href="${url}" target="_blank" rel="noopener noreferrer" class="bg-ink px-3 py-3 text-center font-sans text-xs uppercase tracking-widest text-paper/70 transition hover:bg-paper hover:text-ink">${name}</a>`,
+      )
+      .join('');
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+  }
+
+  document.querySelectorAll('[data-open]').forEach((btn) => {
+    btn.addEventListener('click', () => open(btn as HTMLElement));
+  });
+
+  modal?.querySelector('[data-modal-close]')?.addEventListener('click', close);
+  modal?.addEventListener('click', (e) => {
+    if (panel && !panel.contains(e.target as Node)) close();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') close();
+  });
+</script>

@@ -27,6 +27,11 @@ export interface ReleaseData {
   releaseDate: string;
   /** 1–2 sentence blurb. */
   description: string;
+  /**
+   * Optional streaming links shown in the release popup, e.g.
+   * { "Apple Music": "https://…" }. Spotify is added automatically.
+   */
+  links?: Record<string, string>;
 }
 
 export interface Release extends ReleaseData {

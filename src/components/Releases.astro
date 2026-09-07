@@ -2,7 +2,7 @@
 /**
  * LATEST RELEASES
  * Auto-generated grid. Each card = one folder in content/releases/.
- * Add a release by adding a folder — no code changes. See README.
+ * Click the cover art to play the track inline (Spotify iFrame API).
  */
 import { Image } from 'astro:assets';
 import { getReleases } from '../lib/content';
@@ -18,6 +18,14 @@ function formatDate(iso: string): string {
   const d = new Date(iso);
   return Number.isNaN(d.getTime()) ? '' : dateFmt.format(d);
 }
+
+/** Turn the normalized embed URL into a Spotify URI the iFrame API accepts. */
+function toUri(embedUrl: string): string {
+  const m = embedUrl?.match(
+    /embed\/(track|album|playlist|episode|show)\/([A-Za-z0-9]+)/i,
+  );
+  return m ? `spotify:${m[1].toLowerCase()}:${m[2]}` : '';
+}
 ---
 
 <section id="releases" class="bg-ink py-24 md:py-32">
@@ -32,19 +40,46 @@ function formatDate(iso: string): string {
     ) : (
       <div class="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {releases.map((r) => (
-          <article class="group flex flex-col">
-            {r.cover && (
-              <div class="relative aspect-square overflow-hidden bg-paper/5">
-                <Image
-                  src={r.cover}
-                  alt={`${r.title} cover art`}
-                  class="h-full w-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-105"
-                  widths={[320, 480, 640]}
-                  sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
-                  loading="lazy"
-                />
+          <article class="group flex flex-col" data-release>
+            <div class="relative aspect-square overflow-hidden bg-paper/5">
+              {r.cover && (
+                <button
+                  type="button"
+                  data-play
+                  data-uri={toUri(r.spotifyEmbedUrl)}
+                  aria-label={`Play ${r.title}`}
+                  class="absolute inset-0 block h-full w-full cursor-pointer"
+                >
+                  <Image
+                    src={r.cover}
+                    alt={`${r.title} cover art`}
+                    class="h-full w-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-105"
+                    widths={[320, 480, 640]}
+                    sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
+                    loading="lazy"
+                  />
+                  <span
+                    class="pointer-events-none absolute inset-0 bg-ink/30 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  ></span>
+                  <span
+                    class="pointer-events-none absolute bottom-5 left-5 flex h-14 w-14 items-center justify-center rounded-full border border-paper/80 bg-ink/40 backdrop-blur-sm transition duration-500 group-hover:scale-110 group-hover:bg-ink/60"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      aria-hidden="true"
+                      class="ml-0.5 h-5 w-5 text-paper"
+                    >
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </span>
+                </button>
+              )}
+
+              <div data-player class="absolute inset-0 z-10 hidden bg-ink">
+                <div data-embed></div>
               </div>
-            )}
+            </div>
 
             <div class="mt-5 flex items-baseline justify-between gap-4">
               <h3 class="font-display text-xl uppercase tracking-tight">{r.title}</h3>
@@ -52,28 +87,56 @@ function formatDate(iso: string): string {
                 {formatDate(r.releaseDate)}
               </time>
             </div>
-
-            {r.description && (
-              <p class="mt-2 text-sm leading-relaxed text-paper/60">{r.description}</p>
-            )}
-
-            {r.spotifyEmbedUrl && (
-              <div class="mt-4">
-                <iframe
-                  src={r.spotifyEmbedUrl}
-                  width="100%"
-                  height="80"
-                  frameborder="0"
-                  loading="lazy"
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                  title={`${r.title} — Spotify player`}
-                  class="rounded-lg"
-                ></iframe>
-              </div>
-            )}
           </article>
         ))}
       </div>
     )}
   </div>
 </section>
+
+<script is:inline>
+  // Must exist before the async Spotify script loads.
+  window.__spotifyApi = new Promise((resolve) => {
+    window.onSpotifyIframeApiReady = resolve;
+  });
+</script>
+<script is:inline async src="https://open.spotify.com/embed/iframe-api/v1"></script>
+
+<script>
+  const cards = document.querySelectorAll('[data-release]');
+  const controllers = new WeakMap();
+
+  cards.forEach((card) => {
+    const btn = card.querySelector('[data-play]');
+    const player = card.querySelector('[data-player]');
+    const embed = card.querySelector('[data-embed]');
+    const uri = btn?.getAttribute('data-uri');
+    if (!btn || !player || !embed || !uri) return;
+
+    btn.addEventListener('click', async () => {
+      // Stop whatever else is playing.
+      cards.forEach((other) => {
+        if (other === card) return;
+        const c = controllers.get(other);
+        if (c) c.pause();
+      });
+
+      player.classList.remove('hidden');
+      btn.classList.add('invisible');
+
+      let controller = controllers.get(card);
+      if (!controller) {
+        const API = await window.__spotifyApi;
+        controller = await new Promise((resolve) => {
+          API.createController(
+            embed,
+            { uri, width: '100%', height: '100%' },
+            (c) => resolve(c),
+          );
+        });
+        controllers.set(card, controller);
+      }
+      controller.play();
+    });
+  });
+</script>

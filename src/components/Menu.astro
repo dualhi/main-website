@@ -1,0 +1,114 @@
+---
+/**
+ * SITE MENU
+ * The Dualhï mark sits top-right and doubles as the menu button.
+ * Clicking it opens a full-screen overlay with the numbered sections,
+ * matching the eyebrow numbering used across the page.
+ */
+import { SOCIALS } from '../lib/site';
+import logoMark from '../assets/logo/logo-vector.svg?raw';
+
+const items = [
+  { n: '01', label: 'Music', href: '/music' },
+  { n: '02', label: 'About', href: '/#about' },
+  { n: '03', label: 'TikTok', href: '/#tiktok' },
+  { n: '04', label: 'Press', href: '/#press' },
+  { n: '05', label: 'Contact', href: '/#contact' },
+];
+---
+
+<button
+  type="button"
+  data-menu-toggle
+  aria-expanded="false"
+  aria-controls="site-menu"
+  aria-label="Open menu"
+  class="menu-mark fixed right-5 top-5 z-[60] w-10 text-paper transition duration-300 hover:opacity-70 md:right-8 md:top-8 md:w-12"
+>
+  <Fragment set:html={logoMark} />
+</button>
+
+<div
+  id="site-menu"
+  data-menu
+  hidden
+  class="fixed inset-0 z-50 bg-ink"
+>
+  <nav class="container-x flex h-full flex-col justify-center" aria-label="Main">
+    <ul>
+      {items.map((i) => (
+        <li>
+          <a
+            href={i.href}
+            data-menu-link
+            class="group flex items-baseline gap-5 py-1.5 text-paper transition hover:text-paper/50"
+          >
+            <span class="font-sans text-[0.65rem] uppercase tracking-[0.3em] text-paper/40">
+              {i.n}
+            </span>
+            <span class="font-display text-5xl uppercase leading-[0.95] tracking-tightest md:text-7xl">
+              {i.label}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <div class="mt-14 flex flex-wrap gap-x-7 gap-y-3">
+      {SOCIALS.map((s) => (
+        <a
+          href={s.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="font-sans text-xs uppercase tracking-[0.2em] text-paper/50 transition hover:text-paper"
+        >
+          {s.name}
+        </a>
+      ))}
+    </div>
+  </nav>
+</div>
+
+<style>
+  .menu-mark :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  /* The mark rotates a touch when the menu is open. */
+  .menu-mark[aria-expanded='true'] {
+    transform: rotate(90deg);
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+
+  if (toggle && menu) {
+    const setOpen = (open: boolean) => {
+      menu.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      document.body.style.overflow = open ? 'hidden' : '';
+    };
+
+    toggle.addEventListener('click', () => {
+      setOpen(menu.hidden);
+    });
+
+    // Any link closes it, so in-page anchors actually scroll.
+    menu.querySelectorAll('[data-menu-link]').forEach((link) => {
+      link.addEventListener('click', () => setOpen(false));
+    });
+
+    // Click on the empty backdrop closes it.
+    menu.addEventListener('click', (e) => {
+      if (e.target === menu) setOpen(false);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !menu.hidden) setOpen(false);
+    });
+  }
+</script>

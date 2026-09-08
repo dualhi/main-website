@@ -117,6 +117,54 @@ export function getReleases(): Release[] {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Full catalogue                                                    */
+/* ------------------------------------------------------------------ */
+
+/** One entry of content/releases.json — the complete discography. */
+export interface CatalogueEntry {
+  slug: string;
+  title: string;
+  /** Full credit line, e.g. "Dualhi & KEL". */
+  artists: string;
+  releaseDate: string;
+  /** Remote cover art (Apple CDN), optimized by Astro at build time. */
+  cover: string;
+  appleUrl?: string;
+  spotifyUrl?: string;
+  /** Pin this release as the featured one on /music (falls back to newest). */
+  featured?: boolean;
+}
+
+import catalogueJson from '../../content/releases.json';
+
+/** Every release, newest first. */
+export function getCatalogue(): CatalogueEntry[] {
+  return [...(catalogueJson as CatalogueEntry[])].sort((a, b) =>
+    b.releaseDate.localeCompare(a.releaseDate),
+  );
+}
+
+/** Catalogue grouped by year, newest year first. */
+export function getCatalogueByYear(): { year: string; items: CatalogueEntry[] }[] {
+  const groups = new Map<string, CatalogueEntry[]>();
+  for (const r of getCatalogue()) {
+    const y = r.releaseDate.slice(0, 4);
+    if (!groups.has(y)) groups.set(y, []);
+    groups.get(y)!.push(r);
+  }
+  return [...groups.entries()]
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .map(([year, items]) => ({ year, items }));
+}
+
+/** True when the release is recent enough to badge as new. */
+export function isNewRelease(iso: string, days = 60): boolean {
+  const d = Date.parse(iso);
+  if (Number.isNaN(d)) return false;
+  return Date.now() - d < days * 24 * 60 * 60 * 1000;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Press gallery                                                     */
 /* ------------------------------------------------------------------ */
 

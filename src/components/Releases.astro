@@ -109,6 +109,30 @@ function linksFor(r: { spotifyEmbedUrl: string; links?: Record<string, string> }
         ))}
       </div>
     )}
+
+    <div class="mt-16 border-t border-paper/10 pt-8">
+      <a
+        href="/music"
+        class="group inline-flex items-center gap-4 text-paper transition hover:text-paper/60"
+      >
+        <span class="font-display text-2xl uppercase tracking-tightest md:text-4xl">
+          Discover more music
+        </span>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          aria-hidden="true"
+          class="h-5 w-5 shrink-0 transition-transform duration-500 ease-out-expo group-hover:translate-x-2 md:h-7 md:w-7"
+        >
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      </a>
+      <p class="mt-2 font-sans text-xs uppercase tracking-[0.25em] text-paper/40">
+        Full discography
+      </p>
+    </div>
   </div>
 </section>
 

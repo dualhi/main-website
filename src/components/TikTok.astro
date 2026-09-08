@@ -54,12 +54,22 @@ const profileUrl = SOCIALS.find((s) => s.name === 'TikTok')?.url ?? 'https://www
     </div>
 
     <!-- Carousel: the viewport clips on desktop (GSAP marquee) and becomes a
-         native swipe strip on mobile / reduced-motion. -->
+         native swipe strip on mobile / reduced-motion.
+         The marquee is a plain repeating strip: the same set of cards twice,
+         scrolled left by exactly one set + one gap, then restarted. The clone
+         is hidden (and skipped by screen readers) when the marquee is off. -->
     <div class="tiktok-viewport mt-12 w-full">
       <div class="tiktok-track flex w-max gap-4 px-6 md:px-10">
-        {videos.map((v, i) => (
-          <TikTokCard video={v} index={i} profileUrl={profileUrl} />
-        ))}
+        <div class="tiktok-set flex gap-4">
+          {videos.map((v, i) => (
+            <TikTokCard video={v} index={i} profileUrl={profileUrl} />
+          ))}
+        </div>
+        <div class="tiktok-set tiktok-set--clone flex gap-4" aria-hidden="true">
+          {videos.map((v, i) => (
+            <TikTokCard video={v} index={i} profileUrl={profileUrl} />
+          ))}
+        </div>
       </div>
     </div>
   </div>
@@ -104,6 +114,15 @@ const profileUrl = SOCIALS.find((s) => s.name === 'TikTok')?.url ?? 'https://www
   #tiktok.is-marquee .tiktok-viewport {
     overflow: hidden;
     scroll-snap-type: none;
+  }
+
+  /* The second copy of the strip only exists to make the loop seamless, so it
+     stays out of the way when the marquee isn't running. */
+  .tiktok-set--clone {
+    display: none;
+  }
+  #tiktok.is-marquee .tiktok-set--clone {
+    display: flex;
   }
 </style>
 

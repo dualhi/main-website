@@ -19,11 +19,17 @@ export const SITE = {
   },
 } as const;
 
-/** Booking / management contact, surfaced prominently in the Links section. */
-export const CONTACT = {
-  label: 'Booking & Management',
-  email: 'gm@giacomomoracreative.com',
-} as const;
+/**
+ * Contacts surfaced in the Links section, in order of prominence.
+ * The first one is rendered largest.
+ */
+export const CONTACTS = [
+  { label: 'Booking & Management', email: 'gm@giacomomoracreative.com' },
+  { label: 'General enquiries', email: 'info@wearedualhi.com' },
+] as const;
+
+/** Primary contact — kept for convenience. */
+export const CONTACT = CONTACTS[0];
 
 export interface SocialLink {
   name: string;

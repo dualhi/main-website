@@ -186,8 +186,12 @@ function initEmbedRefresh(section: HTMLElement, viewport: HTMLElement): void {
     if (now() < s.engagedUntil) return;
     if (now() - s.lastReset < OFFSCREEN_MIN_MS) return;
     s.lastReset = now();
-    // Re-assigning the same src reloads the embed back to its cover frame.
-    iframe.src = iframe.src;
+    // Swapping in a fresh clone of the iframe is the one reliable way to force
+    // the embed back to its cover frame: re-assigning the same `src` is not
+    // guaranteed to re-navigate, and the iframe is cross-origin so we can't
+    // reload it from the inside.
+    const fresh = iframe.cloneNode(false) as HTMLIFrameElement;
+    iframe.replaceWith(fresh);
   };
 
   // Mark a card as "in use" when the visitor points at or clicks into it.

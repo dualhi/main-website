@@ -15,7 +15,8 @@
     "releaseDate": "2026-07-24",
     "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1f/4f/c5/1f4fc581-7150-adb8-dae7-b52e4f179fec/3663504.jpg/600x600bb.jpg",
     "appleUrl": "https://music.apple.com/us/album/6791277243",
-    "spotifyUrl": "https://open.spotify.com/track/4jmfdhrDDhJG080eiLE0n2"
+    "spotifyUrl": "https://open.spotify.com/track/4jmfdhrDDhJG080eiLE0n2",
+    "featured": true
   },
   {
     "slug": "bring-it-closer",
@@ -203,5 +204,13 @@
     "releaseDate": "2020-07-03",
     "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/38/f3/b7/38f3b7ed-8f50-36c7-2592-80ade976435b/0190296829611.jpg/600x600bb.jpg",
     "appleUrl": "https://music.apple.com/us/album/1641085792"
+  },
+  {
+    "slug": "show-you",
+    "title": "Show You",
+    "artists": "Dualhï",
+    "releaseDate": "2019-10-04",
+    "cover": "https://i.scdn.co/image/ab67616d0000b273dcc60fe867d9f279ca3b685a",
+    "spotifyUrl": "https://open.spotify.com/track/0yBuLCZZAGRxyZZrIlQAcn"
   }
 ]

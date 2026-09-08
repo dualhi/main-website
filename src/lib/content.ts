@@ -129,8 +129,10 @@ export interface CatalogueEntry {
   releaseDate: string;
   /** Remote cover art (Apple CDN), optimized by Astro at build time. */
   cover: string;
-  appleUrl: string;
+  appleUrl?: string;
   spotifyUrl?: string;
+  /** Pin this release as the featured one on /music (falls back to newest). */
+  featured?: boolean;
 }
 
 import catalogueJson from '../../content/releases.json';

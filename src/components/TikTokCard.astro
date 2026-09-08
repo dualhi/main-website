@@ -1,12 +1,15 @@
 ---
 /**
- * A single TikTok card.
- * - Real video → TikTok's official embed (blockquote + embed.js, loaded once in
- *   TikTok.astro). embed.js turns the blockquote into a correctly-sized player
- *   iframe — reliable everywhere (no Access Denied). It shows the full official
- *   card (author, video, caption).
- * - Placeholder (unrecognized URL) → links to the TikTok profile instead.
+ * A single TikTok card: the video's cover art, linking out to the post.
+ *
+ * We deliberately don't use TikTok's official embed here — it loads an iframe
+ * per card and, once a clip ends (or the embed has been sitting idle), swaps in
+ * a "related videos" panel with other people's content.
+ *
+ * Covers live in content/tiktok/covers/<video id>.jpg; a video without one
+ * falls back to a branded placeholder card.
  */
+import { Image } from 'astro:assets';
 import logoVector from '../assets/logo/logo-vector.svg?raw';
 import type { TikTokVideo } from '../lib/content';
 
@@ -16,42 +19,68 @@ interface Props {
   profileUrl: string;
 }
 const { video, index, profileUrl } = Astro.props;
-const isReal = !!video.id;
+const href = video.id ? video.url : profileUrl;
 ---
 
-{isReal ? (
-  <div class="tiktok-card group w-[325px] shrink-0 transition-transform duration-300 ease-out-expo hover:scale-[1.03]">
-    <blockquote
-      class="tiktok-embed !m-0"
-      cite={video.url}
-      data-video-id={video.id}
-      style="max-width:325px; min-width:300px;"
-    >
-      <section>
-        <a href={video.url} target="_blank" rel="noopener noreferrer">
-          Dualhï on TikTok — reel {index + 1}
-        </a>
-      </section>
-    </blockquote>
-  </div>
-) : (
-  <a
-    href={profileUrl}
-    target="_blank"
-    rel="noopener noreferrer"
-    class="tiktok-card group relative flex aspect-[9/16] w-[64vw] max-w-[230px] shrink-0 flex-col items-center justify-center overflow-hidden rounded-xl bg-paper/[0.04] ring-1 ring-paper/10 transition-transform duration-300 ease-out-expo hover:scale-[1.04] sm:w-[230px]"
-  >
-    <div class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.08]">
-      <div class="w-1/2 text-paper"><Fragment set:html={logoVector} /></div>
-    </div>
-    <span class="relative z-10 font-sans text-xs uppercase tracking-[0.2em] text-paper/60 transition-colors group-hover:text-paper">
-      View on TikTok ↗
-    </span>
-  </a>
-)}
+<a
+  href={href}
+  target="_blank"
+  rel="noopener noreferrer"
+  class="tiktok-card group relative flex aspect-[9/16] w-[64vw] max-w-[260px] shrink-0 items-center justify-center overflow-hidden rounded-xl bg-paper/[0.04] ring-1 ring-paper/10 transition-transform duration-300 ease-out-expo hover:scale-[1.04] sm:w-[260px]"
+  aria-label={`Dualhï on TikTok — reel ${index + 1}`}
+>
+  {video.cover ? (
+    <Fragment>
+      <Image
+        src={video.cover}
+        alt=""
+        class="absolute inset-0 h-full w-full object-cover"
+        widths={[260, 520]}
+        sizes="260px"
+        loading="lazy"
+      />
+
+      <div
+        class="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink/80 to-transparent"
+        aria-hidden="true"
+      >
+      </div>
+
+      <span
+        class="pointer-events-none absolute bottom-3 left-3 flex items-center gap-2 font-sans text-[0.65rem] uppercase tracking-[0.18em] text-paper/85"
+        aria-hidden="true"
+      >
+        <svg viewBox="0 0 24 24" class="h-3 w-3 shrink-0" fill="currentColor">
+          <path d="M8 5v14l11-7z"></path>
+        </svg>
+        Watch on TikTok
+      </span>
+
+      <span
+        class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        aria-hidden="true"
+      >
+        <span class="flex h-14 w-14 items-center justify-center rounded-full bg-paper/90 text-ink">
+          <svg viewBox="0 0 24 24" class="ml-0.5 h-6 w-6" fill="currentColor">
+            <path d="M8 5v14l11-7z"></path>
+          </svg>
+        </span>
+      </span>
+    </Fragment>
+  ) : (
+    <Fragment>
+      <div class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.08]">
+        <div class="tiktok-placeholder w-1/2 text-paper"><Fragment set:html={logoVector} /></div>
+      </div>
+      <span class="relative z-10 font-sans text-xs uppercase tracking-[0.2em] text-paper/60 transition-colors group-hover:text-paper">
+        View on TikTok ↗
+      </span>
+    </Fragment>
+  )}
+</a>
 
 <style>
-  .tiktok-card :global(svg) {
+  .tiktok-card :global(.tiktok-placeholder svg) {
     display: block;
     width: 100%;
     height: auto;

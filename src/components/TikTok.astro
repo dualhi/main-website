@@ -1,11 +1,12 @@
 ---
 /**
  * TIKTOK CAROUSEL
- * Auto-scrolling horizontal band of TikTok videos using TikTok's official
- * embed (blockquote + embed.js) — reliable everywhere. The seamless loop uses a
- * single set of cards (no duplication). Background = repeating Dualhï logo
- * pattern fading into black.
- * Edit the list in content/tiktok/videos.json. See ../scripts/tiktok.ts.
+ * Auto-scrolling horizontal band of TikTok covers. Each card is the video's
+ * cover art and links out to the post — no third-party embed, so no "related
+ * videos" panel at the end of a clip and no extra iframes to load.
+ * Background = repeating Dualhï logo pattern fading into black.
+ * Edit the list in content/tiktok/videos.json and drop the matching cover in
+ * content/tiktok/covers/<video id>.jpg. See ../scripts/tiktok.ts.
  */
 import TikTokCard from './TikTokCard.astro';
 import { getTikToks } from '../lib/content';
@@ -48,17 +49,27 @@ const profileUrl = SOCIALS.find((s) => s.name === 'TikTok')?.url ?? 'https://www
       <h2 class="mt-3 text-5xl md:text-7xl">On TikTok</h2>
       <p class="mt-4 max-w-xl text-sm text-paper/50">
         A live look at what we're doing on TikTok. Hover to slow the reel down,
-        press play on any video to watch.
+        tap any cover to watch it there.
       </p>
     </div>
 
     <!-- Carousel: the viewport clips on desktop (GSAP marquee) and becomes a
-         native swipe strip on mobile / reduced-motion. -->
+         native swipe strip on mobile / reduced-motion.
+         The marquee is a plain repeating strip: the same set of cards twice,
+         scrolled left by exactly one set + one gap, then restarted. The clone
+         is hidden (and skipped by screen readers) when the marquee is off. -->
     <div class="tiktok-viewport mt-12 w-full">
       <div class="tiktok-track flex w-max gap-4 px-6 md:px-10">
-        {videos.map((v, i) => (
-          <TikTokCard video={v} index={i} profileUrl={profileUrl} />
-        ))}
+        <div class="tiktok-set flex gap-4">
+          {videos.map((v, i) => (
+            <TikTokCard video={v} index={i} profileUrl={profileUrl} />
+          ))}
+        </div>
+        <div class="tiktok-set tiktok-set--clone flex gap-4" aria-hidden="true">
+          {videos.map((v, i) => (
+            <TikTokCard video={v} index={i} profileUrl={profileUrl} />
+          ))}
+        </div>
       </div>
     </div>
   </div>
@@ -104,6 +115,15 @@ const profileUrl = SOCIALS.find((s) => s.name === 'TikTok')?.url ?? 'https://www
     overflow: hidden;
     scroll-snap-type: none;
   }
+
+  /* The second copy of the strip only exists to make the loop seamless, so it
+     stays out of the way when the marquee isn't running. */
+  .tiktok-set--clone {
+    display: none;
+  }
+  #tiktok.is-marquee .tiktok-set--clone {
+    display: flex;
+  }
 </style>
 
 <!-- Seamless marquee + hover-slow (GSAP). -->
@@ -111,6 +131,3 @@ const profileUrl = SOCIALS.find((s) => s.name === 'TikTok')?.url ?? 'https://www
   import { initTikTok } from '../scripts/tiktok';
   initTikTok();
 </script>
-
-<!-- Official TikTok embed script: turns the blockquotes into sized players. -->
-<script is:inline async src="https://www.tiktok.com/embed.js"></script>

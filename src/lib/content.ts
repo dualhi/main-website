@@ -201,12 +201,20 @@ export interface TikTokVideo {
   id: string | null;
   /** Player iframe URL, only when a valid id was found. */
   embedUrl: string | null;
+  /** Local cover art: content/tiktok/covers/<id>.jpg, when present. */
+  cover?: ImageMetadata;
 }
 
 // Read the editable list of TikTok video links.
 const tiktokList = import.meta.glob<{ default: string[] }>(
   '../../content/tiktok/videos.json',
   { eager: true },
+);
+
+// Cover art for each video: content/tiktok/covers/<video id>.<ext>
+const tiktokCovers = import.meta.glob<ImageMetadata>(
+  '../../content/tiktok/covers/*.{jpg,jpeg,png,webp,avif}',
+  { eager: true, import: 'default' },
 );
 
 /** Pull the numeric video id out of any TikTok video URL. */
@@ -232,10 +240,15 @@ export function getTikToks(): TikTokVideo[] {
     // We embed via TikTok's official blockquote + embed.js (see TikTokCard /
     // TikTok.astro), which only needs the id + url. embedUrl is kept for
     // reference (the canonical embed endpoint).
+    const coverEntry = id
+      ? Object.entries(tiktokCovers).find(([path]) => path.includes(`/covers/${id}.`))
+      : undefined;
+
     return {
       url,
       id,
       embedUrl: id ? `https://www.tiktok.com/embed/v2/${id}` : null,
+      cover: coverEntry ? (coverEntry[1] as unknown as ImageMetadata) : undefined,
     };
   });
 }

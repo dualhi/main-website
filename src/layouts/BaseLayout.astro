@@ -4,6 +4,7 @@
  */
 import '../styles/global.css';
 import { SITE } from '../lib/site';
+import Menu from '../components/Menu.astro';
 
 interface Props {
   title?: string;
@@ -61,6 +62,7 @@ const ogImageURL = new URL(ogImage, Astro.site ?? Astro.url).toString();
     />
   </head>
   <body>
+    <Menu />
     <slot />
   </body>
 </html>

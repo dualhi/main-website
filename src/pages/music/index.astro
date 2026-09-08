@@ -10,7 +10,7 @@ import { getCatalogue, getCatalogueByYear, isNewRelease } from '../../lib/conten
 import { SITE } from '../../lib/site';
 
 const all = getCatalogue();
-const featured = all[0];
+const featured = all.find((r) => r.featured) ?? all[0];
 const byYear = getCatalogueByYear();
 const years = byYear.map((g) => g.year);
 
@@ -67,14 +67,16 @@ const fmt = (iso: string) => dateFmt.format(new Date(iso));
                   Spotify
                 </a>
               )}
-              <a
-                href={featured.appleUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="border border-paper/25 px-6 py-3 font-sans text-xs uppercase tracking-[0.2em] text-paper transition hover:bg-paper hover:text-ink"
-              >
-                Apple Music
-              </a>
+              {featured.appleUrl && (
+                <a
+                  href={featured.appleUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="border border-paper/25 px-6 py-3 font-sans text-xs uppercase tracking-[0.2em] text-paper transition hover:bg-paper hover:text-ink"
+                >
+                  Apple Music
+                </a>
+              )}
             </div>
           </div>
 

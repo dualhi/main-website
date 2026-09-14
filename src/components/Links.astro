@@ -20,11 +20,15 @@ import { CONTACTS, SOCIALS } from '../lib/site';
           <span class="font-sans text-xs uppercase tracking-[0.3em] text-paper/50">
             {c.label}
           </span>
+          <!-- Long addresses must never widen the page: they scale down on
+               narrow screens and, as a last resort, wrap anywhere. -->
           <a
             href={`mailto:${c.email}`}
             class:list={[
-              'mt-3 block w-fit font-display uppercase tracking-tight transition-colors hover:text-paper/60',
-              i === 0 ? 'text-3xl md:text-5xl' : 'text-2xl text-paper/80 md:text-3xl',
+              'mt-3 block w-fit max-w-full font-display uppercase tracking-tight transition-colors hover:text-paper/60 [overflow-wrap:anywhere]',
+              i === 0
+                ? 'text-[4.1vw] sm:text-3xl md:text-4xl lg:text-5xl'
+                : 'text-[3.4vw] text-paper/80 sm:text-2xl md:text-3xl',
             ]}
           >
             {c.email}

@@ -5,6 +5,7 @@
 import '../styles/global.css';
 import { SITE } from '../lib/site';
 import Menu from '../components/Menu.astro';
+import Analytics from '../components/Analytics.astro';
 
 interface Props {
   title?: string;
@@ -64,5 +65,8 @@ const ogImageURL = new URL(ogImage, Astro.site ?? Astro.url).toString();
   <body>
     <Menu />
     <slot />
+
+    <!-- Google Analytics 4 + the cookie banner that gates it. -->
+    <Analytics />
   </body>
 </html>

@@ -1,0 +1,110 @@
+---
+/**
+ * Google Analytics 4 + cookie consent.
+ *
+ * GA runs in Consent Mode v2 with every storage type denied by default, so
+ * nothing is written to the visitor's browser until they press "Accept".
+ * Before that GA still receives cookieless pings, which keeps the traffic
+ * totals roughly honest without setting a single cookie.
+ *
+ * The choice is remembered in localStorage under `dh-consent`; clearing site
+ * data brings the banner back.
+ */
+const GA_ID = 'G-ZZB1EWVFKH';
+---
+
+<!-- Consent defaults must be set before gtag.js loads. -->
+<script is:inline define:vars={{ GA_ID }}>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  window.gtag = gtag;
+
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied',
+    wait_for_update: 500,
+  });
+
+  // A returning visitor who already accepted shouldn't be asked again.
+  try {
+    if (localStorage.getItem('dh-consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {
+    /* private mode / storage blocked — stay denied */
+  }
+
+  gtag('js', new Date());
+  gtag('config', GA_ID);
+</script>
+
+<script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
+
+<div
+  id="cookie-banner"
+  role="dialog"
+  aria-live="polite"
+  aria-label="Cookie preferences"
+  hidden
+  class="fixed inset-x-4 bottom-4 z-[60] max-w-md rounded-xl bg-ink/95 p-5 ring-1 ring-paper/15 backdrop-blur-md sm:inset-x-auto sm:left-6 sm:bottom-6"
+>
+  <p class="font-sans text-sm leading-relaxed text-paper/75">
+    We use Google Analytics to see how this site is used. Nothing is sold and
+    nothing is used for advertising.
+  </p>
+
+  <div class="mt-4 flex items-center gap-3">
+    <button
+      type="button"
+      data-consent="granted"
+      class="rounded-full bg-paper px-5 py-2 font-sans text-xs uppercase tracking-[0.18em] text-ink transition-opacity hover:opacity-70"
+    >
+      Accept
+    </button>
+    <button
+      type="button"
+      data-consent="denied"
+      class="rounded-full px-5 py-2 font-sans text-xs uppercase tracking-[0.18em] text-paper/60 ring-1 ring-paper/20 transition-colors hover:text-paper"
+    >
+      Decline
+    </button>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    var banner = document.getElementById('cookie-banner');
+    if (!banner) return;
+
+    var stored = null;
+    try {
+      stored = localStorage.getItem('dh-consent');
+    } catch (e) {
+      /* storage blocked: show the banner, remember nothing */
+    }
+
+    if (stored !== 'granted' && stored !== 'denied') banner.hidden = false;
+
+    banner.addEventListener('click', function (event) {
+      var button = event.target.closest('[data-consent]');
+      if (!button) return;
+
+      var choice = button.getAttribute('data-consent');
+      try {
+        localStorage.setItem('dh-consent', choice);
+      } catch (e) {
+        /* nothing to remember, the banner will just come back */
+      }
+
+      if (choice === 'granted' && typeof window.gtag === 'function') {
+        window.gtag('consent', 'update', { analytics_storage: 'granted' });
+      }
+
+      banner.hidden = true;
+    });
+  })();
+</script>

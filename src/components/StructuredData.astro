@@ -1,0 +1,47 @@
+---
+/**
+ * Schema.org data for the duo, emitted once per page in <head>.
+ *
+ * This is what lets Google treat wearedualhi.com, the Spotify page, the Apple
+ * Music page and the socials as one and the same artist — and, through
+ * `alternateName`, understand that "Dualhi" written without the diaeresis is
+ * the same act as "Dualhï".
+ */
+import { SITE, SOCIALS } from '../lib/site';
+
+const siteUrl = (Astro.site ?? new URL('https://wearedualhi.com')).origin;
+
+const graph = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'MusicGroup',
+      '@id': `${siteUrl}/#dualhi`,
+      name: SITE.name,
+      // Every spelling people actually type or print.
+      alternateName: ['Dualhi', 'DUALHÏ', 'DUALHI'],
+      url: `${siteUrl}/`,
+      image: `${siteUrl}${SITE.ogImage}`,
+      description: SITE.description,
+      genre: ['Dance-pop', 'Electronic dance music', 'Melodic EDM'],
+      foundingDate: '2012',
+      foundingLocation: { '@type': 'Place', name: 'Italy' },
+      member: [
+        { '@type': 'Person', name: 'Cristiano Gautier' },
+        { '@type': 'Person', name: 'Kevin Romero' },
+      ],
+      sameAs: SOCIALS.map((s) => s.url),
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${siteUrl}/#website`,
+      url: `${siteUrl}/`,
+      name: SITE.name,
+      inLanguage: 'en',
+      publisher: { '@id': `${siteUrl}/#dualhi` },
+    },
+  ],
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(graph)} is:inline />

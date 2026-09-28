@@ -8,7 +8,7 @@ export const SITE = {
   /** Used in <title> and OG tags. */
   title: 'Dualhï — Official Website',
   description:
-    'Official website and press kit of Dualhï, the Italian dance-pop DJ and producer duo of Cristiano Gautier and Kevin Romero. Music, press photos, bio and booking contact.',
+    'Official website and press kit of Dualhï (Dualhi), the Italian dance-pop DJ and producer duo of Cristiano Gautier and Kevin Romero. Music, press photos, bio and booking contact.',
   tagline: 'Dance-pop DJ & producer duo',
   /** Path (relative to /public) to the default social-share image. */
   ogImage: '/og-image.jpg',

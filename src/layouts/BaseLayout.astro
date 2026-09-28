@@ -6,6 +6,7 @@ import '../styles/global.css';
 import { SITE } from '../lib/site';
 import Menu from '../components/Menu.astro';
 import Analytics from '../components/Analytics.astro';
+import StructuredData from '../components/StructuredData.astro';
 
 interface Props {
   title?: string;
@@ -61,6 +62,10 @@ const ogImageURL = new URL(ogImage, Astro.site ?? Astro.url).toString();
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&display=swap"
     />
+
+    <!-- Tells search engines that Dualhï and Dualhi are the same artist,
+         and ties the site to the streaming and social profiles. -->
+    <StructuredData />
   </head>
   <body>
     <Menu />

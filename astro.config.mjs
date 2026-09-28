@@ -1,12 +1,15 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
+import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  // Public URL of the deployed site. Used for absolute SEO/OG URLs.
-  // Update this to the final production domain before launch.
-  site: 'https://dualhi.netlify.app',
+  // Public URL of the deployed site. Drives the canonical link, the absolute
+  // OG/Twitter image URLs and the sitemap — so it MUST be the real domain,
+  // never the Netlify preview host, or Google is told the canonical version
+  // of every page lives somewhere else.
+  site: 'https://wearedualhi.com',
 
   integrations: [
     tailwind({
@@ -15,6 +18,9 @@ export default defineConfig({
       // injected base stylesheet.
       applyBaseStyles: false,
     }),
+    // Emits /sitemap-index.xml + /sitemap-0.xml at build time; robots.txt
+    // points search engines at it.
+    sitemap(),
   ],
 
   // Astro automatically optimizes images imported from anywhere in the

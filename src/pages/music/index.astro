@@ -132,7 +132,7 @@ const fmt = (iso: string) => dateFmt.format(new Date(iso));
           <div data-year-group={group.year} class="relative mt-20 first:mt-16">
             <span
               aria-hidden="true"
-              class="pointer-events-none absolute -top-10 left-0 select-none font-display text-[7rem] leading-none text-paper/[0.04] md:text-[12rem]"
+              class="pointer-events-none absolute -top-10 left-0 select-none font-display text-[min(7rem,21vw)] leading-none text-paper/[0.10] md:text-[12rem]"
             >
               {group.year}
             </span>

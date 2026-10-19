@@ -6,6 +6,7 @@ import '../styles/global.css';
 import { SITE } from '../lib/site';
 import Menu from '../components/Menu.astro';
 import Analytics from '../components/Analytics.astro';
+import TrackingPixels from '../components/TrackingPixels.astro';
 import StructuredData from '../components/StructuredData.astro';
 
 interface Props {
@@ -73,5 +74,8 @@ const ogImageURL = new URL(ogImage, Astro.site ?? Astro.url).toString();
 
     <!-- Google Analytics 4 + the cookie banner that gates it. -->
     <Analytics />
+
+    <!-- Pixel Meta e TikTok: stesso gate di consenso di GA4. -->
+    <TrackingPixels />
   </body>
 </html>

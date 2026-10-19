@@ -1,0 +1,224 @@
+---
+/**
+ * LAST TIME — pagina pre-save.
+ * Raccoglie la mail su lista nostra, poi manda al pre-save della label.
+ * La voce di catalogo su /music arriva separatamente il giorno dell'uscita.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Footer from '../components/Footer.astro';
+
+/** Uscita: 3 novembre 2026, mezzanotte CET. */
+const RELEASE_ISO = '2026-11-03T00:00:00+01:00';
+/** Pre-save ufficiale Linkfire fornito da Bamboo Artists. */
+const PRESAVE_URL = 'https://dualhixangierobba.lnk.to/LastTime';
+---
+
+<BaseLayout
+  title="Last Time — Dualhï & Angie Robba"
+  description="Last Time, il nuovo singolo di Dualhï con Angie Robba, esce il 3 novembre 2026. Lascia la mail e pre-salvalo."
+  ogImage="/covers/last-time.jpg"
+>
+  <main class="bg-ink">
+    <section class="py-20 md:py-28">
+      <div class="container-x">
+        <a
+          href="/"
+          class="font-sans text-xs uppercase tracking-[0.3em] text-paper/50 transition hover:text-paper"
+        >
+          ← Home
+        </a>
+
+        <div class="mt-10 grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
+          <!-- Artwork -->
+          <div class="relative aspect-square overflow-hidden bg-paper/5">
+            <img
+              src="/covers/last-time.jpg"
+              alt="Last Time — artwork"
+              width="1200"
+              height="1200"
+              class="h-full w-full object-cover"
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+
+          <!-- Testo + form -->
+          <div>
+            <p class="eyebrow">Nuovo singolo</p>
+
+            <h1 class="mt-5 text-[min(3.5rem,13vw)] md:text-8xl">Last Time</h1>
+
+            <p class="mt-4 flex items-center gap-3 font-sans text-sm text-paper/60">
+              <span class="inline-block h-px w-8 bg-paper/40"></span>
+              Dualhï &amp; Angie Robba
+            </p>
+
+            <!-- Countdown -->
+            <div
+              id="countdown"
+              class="mt-9 flex gap-6 font-sans"
+              data-release={RELEASE_ISO}
+              aria-live="polite"
+            >
+              <div>
+                <span data-cd="d" class="block font-display text-4xl leading-none md:text-5xl">—</span>
+                <span class="mt-2 block text-[0.6rem] uppercase tracking-[0.25em] text-paper/40">Giorni</span>
+              </div>
+              <div>
+                <span data-cd="h" class="block font-display text-4xl leading-none md:text-5xl">—</span>
+                <span class="mt-2 block text-[0.6rem] uppercase tracking-[0.25em] text-paper/40">Ore</span>
+              </div>
+              <div>
+                <span data-cd="m" class="block font-display text-4xl leading-none md:text-5xl">—</span>
+                <span class="mt-2 block text-[0.6rem] uppercase tracking-[0.25em] text-paper/40">Minuti</span>
+              </div>
+            </div>
+
+            <p class="mt-9 max-w-md font-sans text-base leading-relaxed text-paper/70">
+              Esce il 3 novembre. Lascia la mail: ti avvisiamo appena è fuori,
+              e intanto puoi pre-salvarlo così parte da solo nella tua libreria.
+            </p>
+
+            <!-- Form -->
+            <form
+              id="presave-form"
+              name="presave-last-time"
+              method="POST"
+              data-netlify="true"
+              netlify-honeypot="company"
+              class="mt-7 max-w-md"
+              novalidate
+            >
+              <!-- Netlify: identifica il form nella dashboard. -->
+              <input type="hidden" name="form-name" value="presave-last-time" />
+              <!-- Trappola anti-bot: invisibile, se compilata l'invio viene scartato. -->
+              <p class="hidden">
+                <label>Non compilare: <input name="company" /></label>
+              </p>
+              <div class="flex flex-col gap-3 sm:flex-row">
+                <label for="email" class="sr-only">Indirizzo email</label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  autocomplete="email"
+                  inputmode="email"
+                  placeholder="la tua mail"
+                  class="w-full min-w-0 border border-paper/25 bg-transparent px-5 py-4 font-sans text-sm text-paper placeholder:text-paper/35 focus:border-paper focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  class="shrink-0 border border-paper bg-paper px-7 py-4 font-sans text-xs uppercase tracking-[0.2em] text-ink transition hover:bg-transparent hover:text-paper"
+                >
+                  Pre-salva
+                </button>
+              </div>
+
+              <p class="mt-4 font-sans text-xs leading-relaxed text-paper/40">
+                Lasciando la mail accetti di ricevere aggiornamenti sulle uscite di
+                Dualhï. Niente spam, ti cancelli con un click da ogni messaggio.
+              </p>
+
+              <p
+                id="form-msg"
+                class="mt-4 hidden font-sans text-sm text-paper/70"
+                role="status"
+                aria-live="polite"
+              ></p>
+            </form>
+
+            <a
+              href={PRESAVE_URL}
+              id="skip-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-6 inline-block font-sans text-xs uppercase tracking-[0.2em] text-paper/35 underline underline-offset-4 transition hover:text-paper"
+            >
+              Vai direttamente al pre-save
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script define:vars={{ PRESAVE_URL }}>
+  // ---- Countdown -------------------------------------------------------
+  const box = document.getElementById('countdown');
+  if (box) {
+    const target = new Date(box.dataset.release).getTime();
+    const cell = (k) => box.querySelector(`[data-cd="${k}"]`);
+    const pad = (n) => String(n).padStart(2, '0');
+
+    const tick = () => {
+      const left = target - Date.now();
+      if (left <= 0) {
+        box.innerHTML =
+          '<p class="font-display text-3xl uppercase leading-none">Fuori ora</p>';
+        return;
+      }
+      const mins = Math.floor(left / 60000);
+      cell('d').textContent = pad(Math.floor(mins / 1440));
+      cell('h').textContent = pad(Math.floor(mins / 60) % 24);
+      cell('m').textContent = pad(mins % 60);
+    };
+
+    tick();
+    setInterval(tick, 30000);
+  }
+
+  // ---- Form ------------------------------------------------------------
+  const form = document.getElementById('presave-form');
+  const msg = document.getElementById('form-msg');
+
+  const say = (text) => {
+    msg.textContent = text;
+    msg.classList.remove('hidden');
+  };
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const input = form.querySelector('#email');
+    const button = form.querySelector('button[type="submit"]');
+    const email = input.value.trim();
+
+    if (!input.checkValidity() || !email) {
+      say('Controlla l’indirizzo: manca qualcosa.');
+      input.focus();
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = 'Un attimo…';
+
+    try {
+      const res = await fetch('/', {
+        method: 'POST',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          'form-name': 'presave-last-time',
+          email,
+          company: '',
+        }).toString(),
+      });
+
+      if (!res.ok) throw new Error(String(res.status));
+
+      say('Fatto. Ti apriamo il pre-save…');
+      // Apre il pre-save della label. Se il browser blocca il popup,
+      // il link "Vai direttamente al pre-save" resta lì sotto.
+      window.location.href = PRESAVE_URL;
+    } catch {
+      // La mail non è passata: non blocchiamo comunque il pre-save.
+      say('Non siamo riusciti a salvare la mail, ma il pre-save funziona lo stesso.');
+      button.disabled = false;
+      button.textContent = 'Pre-salva';
+      document.getElementById('skip-link')?.focus();
+    }
+  });
+</script>

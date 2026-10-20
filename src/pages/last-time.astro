@@ -132,15 +132,6 @@ const PRESAVE_URL = 'https://dualhixangierobba.lnk.to/LastTime';
               ></p>
             </form>
 
-            <a
-              href={PRESAVE_URL}
-              id="skip-link"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="mt-6 inline-block font-sans text-xs uppercase tracking-[0.2em] text-paper/35 underline underline-offset-4 transition hover:text-paper"
-            >
-              Go straight to the pre-save
-            </a>
           </div>
         </div>
       </div>
@@ -199,6 +190,40 @@ const PRESAVE_URL = 'https://dualhixangierobba.lnk.to/LastTime';
     }
 
     button.disabled = true;
+    button.textContent = 'Checking…';
+
+    // Sanity-check the address before it goes anywhere: made-up domains,
+    // throwaway inboxes and typos get caught here.
+    try {
+      const check = await fetch('/.netlify/functions/validate-email', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email }),
+      }).then((r) => r.json());
+
+      if (check && check.ok === false) {
+        if (check.reason === 'typo' && check.suggestion) {
+          say('Did you mean ' + check.suggestion + '?');
+          input.value = check.suggestion;
+        } else if (check.reason === 'disposable') {
+          say('That looks like a throwaway address — use the one you actually read.');
+        } else if (check.reason === 'fake') {
+          say('Use a real address — that one won&rsquo;t reach you.');
+        } else if (check.reason === 'domain') {
+          say('We can&rsquo;t find that mail provider. Check the part after the @.');
+        } else {
+          say('Check the address — something looks off.');
+        }
+        input.focus();
+        input.select();
+        button.disabled = false;
+        button.textContent = 'Pre-save';
+        return;
+      }
+    } catch {
+      // Our check is down: carry on rather than block a real signup.
+    }
+
     button.textContent = 'One moment…';
 
     try {
@@ -219,11 +244,10 @@ const PRESAVE_URL = 'https://dualhixangierobba.lnk.to/LastTime';
       // the "Go straight to the pre-save" link is still right there.
       window.location.href = PRESAVE_URL;
     } catch {
-      // The email didn't go through: never block the pre-save over it.
-      say('We couldn&rsquo;t save your email, but the pre-save still works.');
-      button.disabled = false;
-      button.textContent = 'Pre-save';
-      document.getElementById('skip-link')?.focus();
+      // Our problem, not theirs: a failed save must never cost us the
+      // pre-save, so send them through anyway.
+      say('Opening the pre-save…');
+      window.location.href = PRESAVE_URL;
     }
   });
 </script>

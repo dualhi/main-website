@@ -3,8 +3,8 @@
  * UPCOMING RELEASE — the next single, announced loud.
  *
  * Deliberately the heaviest block on the page after the hero: big artwork,
- * display-size title and a filled button, so the upcoming release outweighs
- * the catalogue sitting below it.
+ * display-size title, a live countdown and a filled button, so the upcoming
+ * release outweighs the catalogue sitting below it.
  *
  * Remove this component (and its import) from src/pages/index.astro on
  * release day, once the track moves into the catalogue.
@@ -12,6 +12,8 @@
 const TITLE = 'Last Time';
 const ARTISTS = 'Dualhï & Angie Robba';
 const OUT_ON = 'Out November 3';
+/** Release: 3 November 2026, midnight CET. Keep in sync with /last-time. */
+const RELEASE_ISO = '2026-11-03T00:00:00+01:00';
 const COVER = '/covers/last-time.jpg';
 const HREF = '/last-time/';
 ---
@@ -39,7 +41,7 @@ const HREF = '/last-time/';
 
       <!-- Copy -->
       <div>
-        <p class="eyebrow">New single</p>
+        <p class="eyebrow">New single — {OUT_ON}</p>
 
         <h2 class="mt-5 text-[min(3.75rem,13vw)] leading-[0.95] md:text-8xl">
           {TITLE}
@@ -50,14 +52,34 @@ const HREF = '/last-time/';
           {ARTISTS}
         </p>
 
-        <!-- Date, carried at display size so it reads from across the room -->
-        <p class="mt-8 font-display text-2xl uppercase leading-none md:text-3xl">
-          {OUT_ON}
-        </p>
+        <!-- Countdown -->
+        <div
+          id="upcoming-countdown"
+          class="mt-9 flex gap-4 font-sans sm:gap-7"
+          data-release={RELEASE_ISO}
+          aria-live="off"
+        >
+          <div>
+            <span data-ucd="d" class="block font-display text-3xl leading-none md:text-4xl">—</span>
+            <span class="mt-2 block text-[0.6rem] uppercase tracking-[0.25em] text-paper/40">Days</span>
+          </div>
+          <div>
+            <span data-ucd="h" class="block font-display text-3xl leading-none md:text-4xl">—</span>
+            <span class="mt-2 block text-[0.6rem] uppercase tracking-[0.25em] text-paper/40">Hours</span>
+          </div>
+          <div>
+            <span data-ucd="m" class="block font-display text-3xl leading-none md:text-4xl">—</span>
+            <span class="mt-2 block text-[0.6rem] uppercase tracking-[0.25em] text-paper/40">Minutes</span>
+          </div>
+          <div>
+            <span data-ucd="s" class="block font-display text-3xl leading-none md:text-4xl">—</span>
+            <span class="mt-2 block text-[0.6rem] uppercase tracking-[0.25em] text-paper/40">Seconds</span>
+          </div>
+        </div>
 
         <a
           href={HREF}
-          class="mt-8 inline-block border border-paper bg-paper px-10 py-5 font-sans text-xs uppercase tracking-[0.2em] text-ink transition hover:bg-transparent hover:text-paper md:text-sm"
+          class="mt-9 inline-block border border-paper bg-paper px-10 py-5 font-sans text-xs uppercase tracking-[0.2em] text-ink transition hover:bg-transparent hover:text-paper md:text-sm"
         >
           Pre-save
         </a>
@@ -65,3 +87,35 @@ const HREF = '/last-time/';
     </div>
   </div>
 </section>
+
+<script is:inline>
+  (function () {
+    var box = document.getElementById('upcoming-countdown');
+    if (!box) return;
+
+    var target = new Date(box.dataset.release).getTime();
+    var cell = function (k) {
+      return box.querySelector('[data-ucd="' + k + '"]');
+    };
+    var pad = function (n) {
+      return String(n).padStart(2, '0');
+    };
+
+    var tick = function () {
+      var left = target - Date.now();
+      if (left <= 0) {
+        box.innerHTML =
+          '<p class="font-display text-2xl uppercase leading-none md:text-3xl">Out now</p>';
+        return;
+      }
+      var secs = Math.floor(left / 1000);
+      cell('d').textContent = pad(Math.floor(secs / 86400));
+      cell('h').textContent = pad(Math.floor(secs / 3600) % 24);
+      cell('m').textContent = pad(Math.floor(secs / 60) % 60);
+      cell('s').textContent = pad(secs % 60);
+    };
+
+    tick();
+    setInterval(tick, 1000);
+  })();
+</script>

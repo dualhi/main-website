@@ -37,6 +37,20 @@ const TYPOS = {
   'virgilo.it': 'virgilio.it', 'tiscai.it': 'tiscali.it',
 };
 
+/**
+ * Mailbox names nobody reads. Catches the usual "pippo@<real domain>",
+ * which no DNS check can ever rule out.
+ */
+const FAKE_MAILBOX = new Set([
+  'pippo', 'pluto', 'paperino', 'topolino', 'pinco', 'pincopallino', 'pallino',
+  'mariorossi', 'mario.rossi', 'johndoe', 'john.doe', 'janedoe',
+  'test', 'tests', 'testing', 'prova', 'prove', 'provaprova', 'esempio',
+  'example', 'sample', 'demo', 'fake', 'finta', 'finto', 'nessuno', 'nobody',
+  'asd', 'asdf', 'asdasd', 'qwerty', 'aaa', 'aaaa', 'abc', 'abcd', 'xxx',
+  'xxxx', 'ciao', 'boh', 'niente', 'anonimo', 'anonymous', 'noreply',
+  'no-reply', 'donotreply', 'spam', 'trash', 'cestino', 'vaffanculo',
+]);
+
 /** Domains that exist but are never a real inbox. */
 const NONSENSE = new Set(['asd.com', 'asdasd.com', 'test.com', 'example.com', 'email.com']);
 
@@ -46,23 +60,28 @@ const json = (body, status = 200) =>
     headers: { 'content-type': 'application/json' },
   });
 
-/** Does the domain accept mail at all? MX, or an A record as fallback. */
+/**
+ * Does the domain accept mail? MX records only.
+ *
+ * An A record is NOT enough: plenty of domains serve a website and take no
+ * mail at all (gaypride.com was the one that slipped through). Falling back
+ * to A let every parked domain in.
+ */
 async function acceptsMail(domain) {
-  const ask = async (type) => {
-    const url = new URL('https://cloudflare-dns.com/dns-query');
-    url.searchParams.set('name', domain);
-    url.searchParams.set('type', type);
-    const res = await fetch(url, { headers: { accept: 'application/dns-json' } });
-    if (!res.ok) throw new Error('dns ' + res.status);
-    return res.json();
-  };
+  const url = new URL('https://cloudflare-dns.com/dns-query');
+  url.searchParams.set('name', domain);
+  url.searchParams.set('type', 'MX');
 
-  const mx = await ask('MX');
-  if (Array.isArray(mx.Answer) && mx.Answer.some((a) => a.type === 15)) return true;
+  const res = await fetch(url, { headers: { accept: 'application/dns-json' } });
+  if (!res.ok) throw new Error('dns ' + res.status);
 
-  // Some small domains route mail on the A record alone.
-  const a = await ask('A');
-  return Array.isArray(a.Answer) && a.Answer.some((r) => r.type === 1);
+  const data = await res.json();
+  const mx = (data.Answer || []).filter((a) => a.type === 15);
+
+  // A single "." target is the null MX record: the domain refuses mail.
+  if (mx.length === 1 && /^0?\s*\.$/.test(String(mx[0].data).trim())) return false;
+
+  return mx.length > 0;
 }
 
 export default async (req) => {
@@ -94,6 +113,13 @@ export default async (req) => {
 
   if (DISPOSABLE.has(domain) || NONSENSE.has(domain)) {
     return json({ ok: false, reason: 'disposable' });
+  }
+
+  // Strip the +tag and any dots before comparing: pippo+x@ and p.i.ppo@
+  // are the same mailbox.
+  const mailbox = email.split('@')[0].split('+')[0].replace(/\./g, '');
+  if (FAKE_MAILBOX.has(mailbox) || /^(.)\1{2,}$/.test(mailbox)) {
+    return json({ ok: false, reason: 'fake' });
   }
 
   try {

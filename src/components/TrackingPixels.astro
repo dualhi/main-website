@@ -1,0 +1,119 @@
+---
+/**
+ * Pixel pubblicitari — Meta e TikTok.
+ *
+ * Gli script NON vengono caricati finché il visitatore non preme "Accept"
+ * sul banner dei cookie: lo stesso gate che usa GA4, cioè la chiave
+ * `dh-consent` in localStorage. Due casi coperti:
+ *   1. visitatore di ritorno che aveva già accettato → carica subito;
+ *   2. visitatore che accetta adesso → carica al click, senza ricaricare
+ *      la pagina.
+ *
+ * Niente <noscript><img> di fallback: quella partirebbe sempre, consenso
+ * o meno, ed è esattamente ciò che vogliamo evitare.
+ */
+const META_PIXEL_ID = '3409935269230745';
+const TIKTOK_PIXEL_ID = 'DAVREBBC77UAAGDAPTT0';
+---
+
+<script is:inline define:vars={{ META_PIXEL_ID, TIKTOK_PIXEL_ID }}>
+  (function () {
+    var loaded = false;
+
+    function loadMeta() {
+      /* Snippet ufficiale Meta, senza la riga noscript. */
+      !(function (f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function () {
+          n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = '2.0';
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s);
+      })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+
+      window.fbq('init', META_PIXEL_ID);
+      window.fbq('track', 'PageView');
+    }
+
+    function loadTikTok() {
+      /* Snippet ufficiale TikTok. */
+      !(function (w, d, t) {
+        w.TiktokAnalyticsObject = t;
+        var ttq = (w[t] = w[t] || []);
+        ttq.methods = [
+          'page','track','identify','instances','debug','on','off','once',
+          'ready','alias','group','enableCookie','disableCookie',
+        ];
+        ttq.setAndDefer = function (obj, method) {
+          obj[method] = function () {
+            obj.push([method].concat(Array.prototype.slice.call(arguments, 0)));
+          };
+        };
+        for (var i = 0; i < ttq.methods.length; i++) ttq.setAndDefer(ttq, ttq.methods[i]);
+        ttq.instance = function (id) {
+          var inst = ttq._i[id] || [];
+          for (var j = 0; j < ttq.methods.length; j++) ttq.setAndDefer(inst, ttq.methods[j]);
+          return inst;
+        };
+        ttq.load = function (id, opts) {
+          var url = 'https://analytics.tiktok.com/i18n/pixel/events.js';
+          ttq._i = ttq._i || {};
+          ttq._i[id] = [];
+          ttq._i[id]._u = url;
+          ttq._t = ttq._t || {};
+          ttq._t[id] = +new Date();
+          ttq._o = ttq._o || {};
+          ttq._o[id] = opts || {};
+          var script = d.createElement('script');
+          script.type = 'text/javascript';
+          script.async = !0;
+          script.src = url + '?sdkid=' + id + '&lib=' + t;
+          var first = d.getElementsByTagName('script')[0];
+          first.parentNode.insertBefore(script, first);
+        };
+      })(window, document, 'ttq');
+
+      window.ttq.load(TIKTOK_PIXEL_ID);
+      window.ttq.page();
+    }
+
+    function loadPixels() {
+      if (loaded) return;
+      loaded = true;
+      try {
+        loadMeta();
+        loadTikTok();
+      } catch (e) {
+        /* un blocco pubblicitario o la rete: il sito deve funzionare lo stesso */
+      }
+    }
+
+    /* 1. Consenso già dato in una visita precedente. */
+    try {
+      if (localStorage.getItem('dh-consent') === 'granted') loadPixels();
+    } catch (e) {
+      /* storage non disponibile: restiamo fermi */
+    }
+
+    /* 2. Consenso dato adesso: il banner di Analytics.astro espone i
+       bottoni con l'attributo data-consent. */
+    document.addEventListener(
+      'click',
+      function (event) {
+        var button = event.target && event.target.closest
+          ? event.target.closest('[data-consent]')
+          : null;
+        if (button && button.getAttribute('data-consent') === 'granted') loadPixels();
+      },
+      true,
+    );
+  })();
+</script>

@@ -132,15 +132,6 @@ const PRESAVE_URL = 'https://dualhixangierobba.lnk.to/LastTime';
               ></p>
             </form>
 
-            <a
-              href={PRESAVE_URL}
-              id="skip-link"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="mt-6 inline-block font-sans text-xs uppercase tracking-[0.2em] text-paper/35 underline underline-offset-4 transition hover:text-paper"
-            >
-              Go straight to the pre-save
-            </a>
           </div>
         </div>
       </div>
@@ -219,11 +210,10 @@ const PRESAVE_URL = 'https://dualhixangierobba.lnk.to/LastTime';
       // the "Go straight to the pre-save" link is still right there.
       window.location.href = PRESAVE_URL;
     } catch {
-      // The email didn't go through: never block the pre-save over it.
-      say('We couldn&rsquo;t save your email, but the pre-save still works.');
-      button.disabled = false;
-      button.textContent = 'Pre-save';
-      document.getElementById('skip-link')?.focus();
+      // Our problem, not theirs: a failed save must never cost us the
+      // pre-save, so send them through anyway.
+      say('Opening the pre-save…');
+      window.location.href = PRESAVE_URL;
     }
   });
 </script>

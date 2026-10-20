@@ -1,21 +1,21 @@
 ---
 /**
- * LAST TIME — pagina pre-save.
- * Raccoglie la mail su lista nostra, poi manda al pre-save della label.
- * La voce di catalogo su /music arriva separatamente il giorno dell'uscita.
+ * LAST TIME — pre-save page.
+ * Collects the email on our own list, then hands off to the label's pre-save.
+ * The /music catalogue entry ships separately on release day.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Footer from '../components/Footer.astro';
 
-/** Uscita: 3 novembre 2026, mezzanotte CET. */
+/** Release: 3 November 2026, midnight CET. */
 const RELEASE_ISO = '2026-11-03T00:00:00+01:00';
-/** Pre-save ufficiale Linkfire fornito da Bamboo Artists. */
+/** Official Linkfire pre-save supplied by Bamboo Artists. */
 const PRESAVE_URL = 'https://dualhixangierobba.lnk.to/LastTime';
 ---
 
 <BaseLayout
   title="Last Time — Dualhï & Angie Robba"
-  description="Last Time, il nuovo singolo di Dualhï con Angie Robba, esce il 3 novembre 2026. Lascia la mail e pre-salvalo."
+  description="Last Time, the new single from Dualhï with Angie Robba, is out 3 November 2026. Leave your email and pre-save it."
   ogImage="/covers/last-time.jpg"
 >
   <main class="bg-ink">
@@ -44,7 +44,7 @@ const PRESAVE_URL = 'https://dualhixangierobba.lnk.to/LastTime';
 
           <!-- Testo + form -->
           <div>
-            <p class="eyebrow">Nuovo singolo</p>
+            <p class="eyebrow">New single</p>
 
             <h1 class="mt-5 text-[min(3.5rem,13vw)] md:text-8xl">Last Time</h1>
 
@@ -56,27 +56,31 @@ const PRESAVE_URL = 'https://dualhixangierobba.lnk.to/LastTime';
             <!-- Countdown -->
             <div
               id="countdown"
-              class="mt-9 flex gap-6 font-sans"
+              class="mt-9 flex gap-4 font-sans sm:gap-6"
               data-release={RELEASE_ISO}
               aria-live="polite"
             >
               <div>
                 <span data-cd="d" class="block font-display text-4xl leading-none md:text-5xl">—</span>
-                <span class="mt-2 block text-[0.6rem] uppercase tracking-[0.25em] text-paper/40">Giorni</span>
+                <span class="mt-2 block text-[0.6rem] uppercase tracking-[0.25em] text-paper/40">Days</span>
               </div>
               <div>
                 <span data-cd="h" class="block font-display text-4xl leading-none md:text-5xl">—</span>
-                <span class="mt-2 block text-[0.6rem] uppercase tracking-[0.25em] text-paper/40">Ore</span>
+                <span class="mt-2 block text-[0.6rem] uppercase tracking-[0.25em] text-paper/40">Hours</span>
               </div>
               <div>
                 <span data-cd="m" class="block font-display text-4xl leading-none md:text-5xl">—</span>
-                <span class="mt-2 block text-[0.6rem] uppercase tracking-[0.25em] text-paper/40">Minuti</span>
+                <span class="mt-2 block text-[0.6rem] uppercase tracking-[0.25em] text-paper/40">Minutes</span>
+              </div>
+              <div>
+                <span data-cd="s" class="block font-display text-4xl leading-none md:text-5xl">—</span>
+                <span class="mt-2 block text-[0.6rem] uppercase tracking-[0.25em] text-paper/40">Seconds</span>
               </div>
             </div>
 
             <p class="mt-9 max-w-md font-sans text-base leading-relaxed text-paper/70">
-              Esce il 3 novembre. Lascia la mail: ti avvisiamo appena è fuori,
-              e intanto puoi pre-salvarlo così parte da solo nella tua libreria.
+              Out November 3. Leave your email and we&rsquo;ll tell you the moment
+              it lands. Pre-save it now and it goes straight into your library.
             </p>
 
             <!-- Form -->
@@ -89,14 +93,14 @@ const PRESAVE_URL = 'https://dualhixangierobba.lnk.to/LastTime';
               class="mt-7 max-w-md"
               novalidate
             >
-              <!-- Netlify: identifica il form nella dashboard. -->
+              <!-- Netlify: identifies the form in the dashboard. -->
               <input type="hidden" name="form-name" value="presave-last-time" />
-              <!-- Trappola anti-bot: invisibile, se compilata l'invio viene scartato. -->
+              <!-- Bot trap: hidden, a filled-in value gets the submission dropped. -->
               <p class="hidden">
-                <label>Non compilare: <input name="company" /></label>
+                <label>Leave this empty: <input name="company" /></label>
               </p>
               <div class="flex flex-col gap-3 sm:flex-row">
-                <label for="email" class="sr-only">Indirizzo email</label>
+                <label for="email" class="sr-only">Email address</label>
                 <input
                   id="email"
                   name="email"
@@ -104,20 +108,20 @@ const PRESAVE_URL = 'https://dualhixangierobba.lnk.to/LastTime';
                   required
                   autocomplete="email"
                   inputmode="email"
-                  placeholder="la tua mail"
+                  placeholder="your email"
                   class="w-full min-w-0 border border-paper/25 bg-transparent px-5 py-4 font-sans text-sm text-paper placeholder:text-paper/35 focus:border-paper focus:outline-none"
                 />
                 <button
                   type="submit"
                   class="shrink-0 border border-paper bg-paper px-7 py-4 font-sans text-xs uppercase tracking-[0.2em] text-ink transition hover:bg-transparent hover:text-paper"
                 >
-                  Pre-salva
+                  Pre-save
                 </button>
               </div>
 
               <p class="mt-4 font-sans text-xs leading-relaxed text-paper/40">
-                Lasciando la mail accetti di ricevere aggiornamenti sulle uscite di
-                Dualhï. Niente spam, ti cancelli con un click da ogni messaggio.
+                By leaving your email you agree to hear from Dualhï about new
+                releases. No spam, and one click unsubscribes you from any message.
               </p>
 
               <p
@@ -135,7 +139,7 @@ const PRESAVE_URL = 'https://dualhixangierobba.lnk.to/LastTime';
               rel="noopener noreferrer"
               class="mt-6 inline-block font-sans text-xs uppercase tracking-[0.2em] text-paper/35 underline underline-offset-4 transition hover:text-paper"
             >
-              Vai direttamente al pre-save
+              Go straight to the pre-save
             </a>
           </div>
         </div>
@@ -158,17 +162,18 @@ const PRESAVE_URL = 'https://dualhixangierobba.lnk.to/LastTime';
       const left = target - Date.now();
       if (left <= 0) {
         box.innerHTML =
-          '<p class="font-display text-3xl uppercase leading-none">Fuori ora</p>';
+          '<p class="font-display text-3xl uppercase leading-none">Out now</p>';
         return;
       }
-      const mins = Math.floor(left / 60000);
-      cell('d').textContent = pad(Math.floor(mins / 1440));
-      cell('h').textContent = pad(Math.floor(mins / 60) % 24);
-      cell('m').textContent = pad(mins % 60);
+      const secs = Math.floor(left / 1000);
+      cell('d').textContent = pad(Math.floor(secs / 86400));
+      cell('h').textContent = pad(Math.floor(secs / 3600) % 24);
+      cell('m').textContent = pad(Math.floor(secs / 60) % 60);
+      cell('s').textContent = pad(secs % 60);
     };
 
     tick();
-    setInterval(tick, 30000);
+    setInterval(tick, 1000);
   }
 
   // ---- Form ------------------------------------------------------------
@@ -188,13 +193,13 @@ const PRESAVE_URL = 'https://dualhixangierobba.lnk.to/LastTime';
     const email = input.value.trim();
 
     if (!input.checkValidity() || !email) {
-      say('Controlla l’indirizzo: manca qualcosa.');
+      say('Check the address — something looks off.');
       input.focus();
       return;
     }
 
     button.disabled = true;
-    button.textContent = 'Un attimo…';
+    button.textContent = 'One moment…';
 
     try {
       const res = await fetch('/', {
@@ -209,15 +214,15 @@ const PRESAVE_URL = 'https://dualhixangierobba.lnk.to/LastTime';
 
       if (!res.ok) throw new Error(String(res.status));
 
-      say('Fatto. Ti apriamo il pre-save…');
-      // Apre il pre-save della label. Se il browser blocca il popup,
-      // il link "Vai direttamente al pre-save" resta lì sotto.
+      say('Done. Opening the pre-save…');
+      // Hands off to the label's pre-save. If anything gets in the way,
+      // the "Go straight to the pre-save" link is still right there.
       window.location.href = PRESAVE_URL;
     } catch {
-      // La mail non è passata: non blocchiamo comunque il pre-save.
-      say('Non siamo riusciti a salvare la mail, ma il pre-save funziona lo stesso.');
+      // The email didn't go through: never block the pre-save over it.
+      say('We couldn&rsquo;t save your email, but the pre-save still works.');
       button.disabled = false;
-      button.textContent = 'Pre-salva';
+      button.textContent = 'Pre-save';
       document.getElementById('skip-link')?.focus();
     }
   });

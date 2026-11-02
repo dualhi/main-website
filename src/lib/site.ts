@@ -14,7 +14,7 @@ export const SITE = {
   ogImage: '/og-image.jpg',
   /** Bio highlight stat. */
   stat: {
-    value: '9.6M+',
+    value: '9.8M+',
     label: 'Spotify streams',
   },
 } as const;

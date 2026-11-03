@@ -1,5 +1,15 @@
 [
   {
+    "slug": "last-time",
+    "title": "Last Time",
+    "artists": "Dualhï & Angie Robba",
+    "releaseDate": "2026-11-03",
+    "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/19/e2/ef/19e2efbf-6189-31c9-19bd-8db337f84bf9/4522126.jpg/600x600bb.jpg",
+    "appleUrl": "https://music.apple.com/us/album/6823162709",
+    "spotifyUrl": "https://open.spotify.com/track/4VxFDfOeMU2ok0PHT12u9z",
+    "featured": true
+  },
+  {
     "slug": "lift-me-up",
     "title": "Lift Me Up",
     "artists": "Dualhï",
@@ -15,8 +25,7 @@
     "releaseDate": "2026-07-24",
     "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1f/4f/c5/1f4fc581-7150-adb8-dae7-b52e4f179fec/3663504.jpg/600x600bb.jpg",
     "appleUrl": "https://music.apple.com/us/album/6791277243",
-    "spotifyUrl": "https://open.spotify.com/track/4jmfdhrDDhJG080eiLE0n2",
-    "featured": true
+    "spotifyUrl": "https://open.spotify.com/track/4jmfdhrDDhJG080eiLE0n2"
   },
   {
     "slug": "bring-it-closer",

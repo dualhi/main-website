@@ -1,21 +1,34 @@
 ---
 /**
- * LAST TIME — pre-save page.
- * Collects the email on our own list, then hands off to the label's pre-save.
- * The /music catalogue entry ships separately on release day.
+ * LAST TIME — out now.
+ *
+ * Campaign landing page. The single is out, so this page sends straight to the
+ * streaming services: no countdown, no email form, no pre-save. Traffic gets
+ * here from the ads — the page is deliberately not linked from the site.
+ *
+ * For the next single, copy this page and swap the constants below.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Footer from '../components/Footer.astro';
 
-/** Release: 3 November 2026, midnight CET. */
-const RELEASE_ISO = '2026-11-03T00:00:00+01:00';
-/** Official Linkfire pre-save supplied by Bamboo Artists. */
-const PRESAVE_URL = 'https://dualhixangierobba.lnk.to/LastTime';
+/** Out now since 3 November 2026 on Bamboo Artists. */
+const SPOTIFY = 'https://open.spotify.com/track/4VxFDfOeMU2ok0PHT12u9z';
+const APPLE = 'https://music.apple.com/us/album/6823162709';
+
+/** Smart link from the label: everywhere else, YouTube Music included. */
+const ALL_PLATFORMS = 'https://dualhixangierobba.lnk.to/LastTime';
+
+/** Direct links, verified on release day. */
+const MORE = [
+  { label: 'Amazon Music', href: 'https://music.amazon.com/tracks/B0HN55R932' },
+  { label: 'Deezer', href: 'https://www.deezer.com/track/4355092812' },
+  { label: 'Tidal', href: 'https://tidal.com/track/570128422' },
+];
 ---
 
 <BaseLayout
   title="Last Time — Dualhï & Angie Robba"
-  description="Last Time, the new single from Dualhï with Angie Robba, is out 3 November 2026. Leave your email and pre-save it."
+  description="Last Time, the new single from Dualhï with Angie Robba, is out now. Listen on Spotify, Apple Music and everywhere else."
   ogImage="/covers/last-time.jpg"
 >
   <main class="bg-ink">
@@ -25,122 +38,93 @@ const PRESAVE_URL = 'https://dualhixangierobba.lnk.to/LastTime';
           href="/"
           class="font-sans text-xs uppercase tracking-[0.3em] text-paper/50 transition hover:text-paper"
         >
-          ← Home
+          &larr; Home
         </a>
 
         <div class="mt-10 grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
           <!-- Artwork -->
-          <div class="relative aspect-square overflow-hidden bg-paper/5">
+          <a
+            href={ALL_PLATFORMS}
+            target="_blank"
+            rel="noopener"
+            class="group relative block aspect-square overflow-hidden bg-paper/5"
+            tabindex="-1"
+            aria-hidden="true"
+          >
             <img
               src="/covers/last-time.jpg"
-              alt="Last Time — artwork"
+              alt=""
               width="1200"
               height="1200"
-              class="h-full w-full object-cover"
+              class="h-full w-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-105"
               loading="eager"
               decoding="async"
             />
-          </div>
+          </a>
 
-          <!-- Testo + form -->
+          <!-- Copy -->
           <div>
-            <p class="eyebrow">New single</p>
+            <p class="eyebrow">New single &mdash; Out now</p>
 
-            <h1 class="mt-5 text-[min(3.5rem,13vw)] md:text-8xl">Last Time</h1>
+            <h1 class="mt-5 text-[min(3.5rem,13vw)] leading-[0.95] md:text-8xl">
+              Last Time
+            </h1>
 
-            <p class="mt-4 flex items-center gap-3 font-sans text-sm text-paper/60">
+            <p class="mt-4 flex items-center gap-3 font-sans text-sm text-paper/60 md:text-base">
               <span class="inline-block h-px w-8 bg-paper/40"></span>
-              Dualhï &amp; Angie Robba
+              Dualh&iuml; &amp; Angie Robba
             </p>
-
-            <!-- Countdown -->
-            <div
-              id="countdown"
-              class="mt-9 flex gap-4 font-sans sm:gap-6"
-              data-release={RELEASE_ISO}
-              aria-live="polite"
-            >
-              <div>
-                <span data-cd="d" class="block font-display text-4xl leading-none md:text-5xl">—</span>
-                <span class="mt-2 block text-[0.6rem] uppercase tracking-[0.25em] text-paper/40">Days</span>
-              </div>
-              <div>
-                <span data-cd="h" class="block font-display text-4xl leading-none md:text-5xl">—</span>
-                <span class="mt-2 block text-[0.6rem] uppercase tracking-[0.25em] text-paper/40">Hours</span>
-              </div>
-              <div>
-                <span data-cd="m" class="block font-display text-4xl leading-none md:text-5xl">—</span>
-                <span class="mt-2 block text-[0.6rem] uppercase tracking-[0.25em] text-paper/40">Minutes</span>
-              </div>
-              <div>
-                <span data-cd="s" class="block font-display text-4xl leading-none md:text-5xl">—</span>
-                <span class="mt-2 block text-[0.6rem] uppercase tracking-[0.25em] text-paper/40">Seconds</span>
-              </div>
-            </div>
 
             <p class="mt-9 max-w-md font-sans text-base leading-relaxed text-paper/70">
-              Out November 3. Leave your email and we&rsquo;ll tell you the moment
-              it lands. Pre-save it now and it goes straight into your library.
+              Out now on Bamboo Artists. Pick where you listen.
             </p>
 
-            <!-- Form -->
-            <form
-              id="presave-form"
-              name="presave-last-time"
-              method="POST"
-              data-netlify="true"
-              netlify-honeypot="company"
-              class="mt-7 max-w-md"
-              novalidate
-            >
-              <!-- Netlify: identifies the form in the dashboard. -->
-              <input type="hidden" name="form-name" value="presave-last-time" />
-              <!-- Bot trap: hidden, a filled-in value gets the submission dropped. -->
-              <p class="hidden">
-                <label>Leave this empty: <input name="company" /></label>
-              </p>
-              <div class="flex flex-col gap-3 sm:flex-row">
-                <label for="email" class="sr-only">Email address</label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  autocomplete="email"
-                  inputmode="email"
-                  placeholder="your email"
-                  class="w-full min-w-0 border border-paper/25 bg-transparent px-5 py-4 font-sans text-sm text-paper placeholder:text-paper/35 focus:border-paper focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  class="shrink-0 border border-paper bg-paper px-7 py-4 font-sans text-xs uppercase tracking-[0.2em] text-ink transition hover:bg-transparent hover:text-paper"
-                >
-                  Pre-save
-                </button>
-              </div>
-
-              <p class="mt-4 font-sans text-xs leading-relaxed text-paper/40">
-                By leaving your email you agree to hear from Dualhï about new
-                releases. No spam, and one click unsubscribes you from any message.
-              </p>
-
-              <!-- Skip: pre-save without leaving the email. -->
+            <!-- Listen -->
+            <div class="mt-7 flex flex-wrap gap-3 sm:gap-4">
               <a
-                id="skip-presave"
-                href={PRESAVE_URL}
-                class="mt-5 inline-block font-sans text-xs uppercase tracking-[0.2em] text-paper/50 underline underline-offset-4 transition hover:text-paper"
+                href={SPOTIFY}
+                target="_blank"
+                rel="noopener"
+                class="inline-block border border-paper bg-paper px-10 py-5 font-sans text-xs uppercase tracking-[0.2em] text-ink transition hover:bg-transparent hover:text-paper md:text-sm"
               >
-                Skip — pre-save without email →
+                Listen on Spotify
               </a>
+              <a
+                href={APPLE}
+                target="_blank"
+                rel="noopener"
+                class="inline-block border border-paper/40 px-10 py-5 font-sans text-xs uppercase tracking-[0.2em] text-paper transition hover:border-paper md:text-sm"
+              >
+                Apple Music
+              </a>
+            </div>
 
-              <p
-                id="form-msg"
-                class="mt-4 hidden font-sans text-sm text-paper/70"
-                role="status"
-                aria-live="polite"
-              ></p>
-            </form>
+            <!-- The rest, kept quieter -->
+            <ul class="mt-7 flex flex-wrap gap-x-7 gap-y-3 font-sans text-xs uppercase tracking-[0.2em] text-paper/50">
+              {
+                MORE.map((service) => (
+                  <li>
+                    <a
+                      href={service.href}
+                      target="_blank"
+                      rel="noopener"
+                      class="underline-offset-4 transition hover:text-paper hover:underline"
+                    >
+                      {service.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
 
+            <a
+              href={ALL_PLATFORMS}
+              target="_blank"
+              rel="noopener"
+              class="mt-7 inline-block font-sans text-xs uppercase tracking-[0.2em] text-paper/60 underline-offset-4 transition hover:text-paper hover:underline"
+            >
+              All platforms &rarr;
+            </a>
           </div>
         </div>
       </div>
@@ -149,114 +133,3 @@ const PRESAVE_URL = 'https://dualhixangierobba.lnk.to/LastTime';
 
   <Footer />
 </BaseLayout>
-
-<script define:vars={{ PRESAVE_URL }}>
-  // ---- Countdown -------------------------------------------------------
-  const box = document.getElementById('countdown');
-  if (box) {
-    const target = new Date(box.dataset.release).getTime();
-    const cell = (k) => box.querySelector(`[data-cd="${k}"]`);
-    const pad = (n) => String(n).padStart(2, '0');
-
-    const tick = () => {
-      const left = target - Date.now();
-      if (left <= 0) {
-        box.innerHTML =
-          '<p class="font-display text-3xl uppercase leading-none">Out now</p>';
-        return;
-      }
-      const secs = Math.floor(left / 1000);
-      cell('d').textContent = pad(Math.floor(secs / 86400));
-      cell('h').textContent = pad(Math.floor(secs / 3600) % 24);
-      cell('m').textContent = pad(Math.floor(secs / 60) % 60);
-      cell('s').textContent = pad(secs % 60);
-    };
-
-    tick();
-    setInterval(tick, 1000);
-  }
-
-  // ---- Form ------------------------------------------------------------
-  const form = document.getElementById('presave-form');
-  const msg = document.getElementById('form-msg');
-
-  const say = (text) => {
-    msg.textContent = text;
-    msg.classList.remove('hidden');
-  };
-
-  form?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const input = form.querySelector('#email');
-    const button = form.querySelector('button[type="submit"]');
-    const email = input.value.trim();
-
-    if (!input.checkValidity() || !email) {
-      say('Check the address — something looks off.');
-      input.focus();
-      return;
-    }
-
-    button.disabled = true;
-    button.textContent = 'Checking…';
-
-    // Sanity-check the address before it goes anywhere: made-up domains,
-    // throwaway inboxes and typos get caught here.
-    try {
-      const check = await fetch('/.netlify/functions/validate-email', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ email }),
-      }).then((r) => r.json());
-
-      if (check && check.ok === false) {
-        if (check.reason === 'typo' && check.suggestion) {
-          say('Did you mean ' + check.suggestion + '?');
-          input.value = check.suggestion;
-        } else if (check.reason === 'disposable') {
-          say('That looks like a throwaway address — use the one you actually read.');
-        } else if (check.reason === 'fake') {
-          say('Use a real address — that one won&rsquo;t reach you.');
-        } else if (check.reason === 'domain') {
-          say('We can&rsquo;t find that mail provider. Check the part after the @.');
-        } else {
-          say('Check the address — something looks off.');
-        }
-        input.focus();
-        input.select();
-        button.disabled = false;
-        button.textContent = 'Pre-save';
-        return;
-      }
-    } catch {
-      // Our check is down: carry on rather than block a real signup.
-    }
-
-    button.textContent = 'One moment…';
-
-    try {
-      const res = await fetch('/', {
-        method: 'POST',
-        headers: { 'content-type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          'form-name': 'presave-last-time',
-          email,
-          company: '',
-        }).toString(),
-      });
-
-      if (!res.ok) throw new Error(String(res.status));
-
-      say('Done. Opening the pre-save…');
-      // Hands off to the label's pre-save. If anything gets in the way,
-      // the "Go straight to the pre-save" link is still right there.
-      window.location.href = PRESAVE_URL;
-    } catch {
-      // Our problem, not theirs: a failed save must never cost us the
-      // pre-save, so send them through anyway.
-      say('Opening the pre-save…');
-      window.location.href = PRESAVE_URL;
-    }
-  });
-</script>
